@@ -20,6 +20,8 @@ public partial class FleetViewModel : ObservableObject
 
     public ObservableCollection<PrinterViewModel> Printers { get; }
 
+    public Fleet Core => _fleet;
+
     [ObservableProperty] private PrinterViewModel? _selected;
     [ObservableProperty] private string _updatedText = "Updated just now";
 

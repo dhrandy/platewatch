@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="PlateWatch.App.SettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:services="using:PlateWatch.App.Services">
+    <ScrollViewer Padding="26">
+        <StackPanel Spacing="18" MaxWidth="520">
+            <TextBlock Text="Settings" FontSize="22" FontWeight="SemiBold" />
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="NOTIFICATIONS" FontSize="9" FontWeight="SemiBold" Foreground="#6B7280" />
+                <ToggleSwitch x:Name="ToastsToggle" Header="Toast notifications"
+                              OnContent="On" OffContent="Off" Toggled="OnToastsToggled" />
+                <ToggleSwitch x:Name="PrintStartToggle" Header="When a print starts"
+                              OnContent="On" OffContent="Off" Toggled="OnPrintStartToggled" />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="STARTUP" FontSize="9" FontWeight="SemiBold" Foreground="#6B7280" />
+                <ToggleSwitch x:Name="StartupToggle" Header="Start PlateWatch with Windows"
+                              OnContent="On" OffContent="Off" Toggled="OnStartupToggled" />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="PRINTERS" FontSize="9" FontWeight="SemiBold" Foreground="#6B7280" />
+                <ListView x:Name="PrinterList" MaxHeight="180">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="services:PrinterConfig">
+                            <StackPanel Padding="0,4">
+                                <TextBlock FontSize="13" FontWeight="SemiBold">
+                                    <Run Text="{x:Bind Name}" /><Run Text="  ·  " /><Run Text="{x:Bind Model}" />
+                                </TextBlock>
+                                <TextBlock FontSize="11" Foreground="#8A919C">
+                                    <Run Text="{x:Bind IpAddress}" /><Run Text="  ·  " /><Run Text="{x:Bind Serial}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <Border CornerRadius="10" Background="#0BFFFFFF" BorderBrush="#12FFFFFF"
+                        BorderThickness="1" Padding="16">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Add a printer (LAN mode)" FontWeight="SemiBold" />
+                        <TextBox x:Name="NameBox" PlaceholderText="Name (e.g. P1S)" />
+                        <TextBox x:Name="ModelBox" PlaceholderText="Model (e.g. Bambu Lab P1S)" />
+                        <TextBox x:Name="IpBox" PlaceholderText="IP address" />
+                        <TextBox x:Name="SerialBox" PlaceholderText="Serial number" />
+                        <PasswordBox x:Name="AccessCodeBox" PlaceholderText="Access code (stored encrypted)" />
+                        <Button Content="Add printer" Click="OnAddPrinter"
+                                HorizontalAlignment="Right" Background="#4CC2FF" Foreground="#14222E"
+                                FontWeight="SemiBold" CornerRadius="6" />
+                        <TextBlock x:Name="AddError" FontSize="11" Foreground="#E69F00"
+                                   Visibility="Collapsed" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
