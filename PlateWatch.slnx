@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PlateWatch.Core/PlateWatch.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PlateWatch.Tests/PlateWatch.Tests.csproj" />
+  </Folder>
+</Solution>
