@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="PlateWatch.App.Controls.PrinterArt"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:PlateWatch.App.ViewModels">
+    <Grid x:Name="Root">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="26*" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="72*" />
+        </Grid.RowDefinitions>
+
+        <!-- AMS unit with spools -->
+        <Border Grid.Row="0" CornerRadius="6" Background="#26292F" BorderBrush="#3A3F47" BorderThickness="1.5">
+            <ItemsControl ItemsSource="{x:Bind Spools, Mode=OneWay}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SpoolViewModel">
+                        <Ellipse Width="14" Height="14" Margin="3,0"
+                                 Fill="{x:Bind ColorBrush}" Stroke="#101216" StrokeThickness="1.5" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
+        <!-- Enclosure -->
+        <Border Grid.Row="2" CornerRadius="6" Background="#26292F" BorderBrush="#3A3F47" BorderThickness="1.5">
+            <Grid Margin="6">
+                <!-- glass door -->
+                <Border CornerRadius="4" Background="#191C21" BorderBrush="#3A3F47" BorderThickness="1" Margin="0,4,0,10">
+                    <Grid x:Name="Door">
+                        <Rectangle Height="2" Fill="#6B7280" VerticalAlignment="Top" Margin="4,16,4,0" />
+                        <Border Width="14" Height="10" VerticalAlignment="Top" Margin="0,20,0,0"
+                                CornerRadius="2" Background="#4A5058" HorizontalAlignment="Center" />
+                        <Rectangle Height="2" Fill="#6B7280" VerticalAlignment="Bottom" Margin="6,0,6,18" />
+                        <Border x:Name="Part" Width="34" VerticalAlignment="Bottom" Margin="0,0,0,20"
+                                CornerRadius="2" Background="{x:Bind FilamentBrush, Mode=OneWay}"
+                                Height="{x:Bind PartHeight, Mode=OneWay}" HorizontalAlignment="Center" />
+                    </Grid>
+                </Border>
+                <!-- status LED -->
+                <Border Width="18" Height="3" CornerRadius="1.5" Background="#56B4E9"
+                        VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,3" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
