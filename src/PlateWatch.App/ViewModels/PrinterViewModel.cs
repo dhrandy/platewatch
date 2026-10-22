@@ -48,6 +48,40 @@ public partial class PrinterViewModel : ObservableObject
     [ObservableProperty] private bool _canPause;
     [ObservableProperty] private string _speedLabel = "Speed";
     [ObservableProperty] private string _lightLabel = "Light";
+    [ObservableProperty] private double _nozzleFrac01;
+    [ObservableProperty] private double _bedFrac01;
+    [ObservableProperty] private double _fanFrac01;
+    [ObservableProperty] private string _filamentHeader = "FILAMENT";
+    [ObservableProperty] private string _activeSpoolCaption = "";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ChipBackgroundBrush))]
+    [NotifyPropertyChangedFor(nameof(ChipBorderBrush))]
+    [NotifyPropertyChangedFor(nameof(ChipNameBrush))]
+    [NotifyPropertyChangedFor(nameof(ChipSubBrush))]
+    private bool _isSelected;
+
+    /// <summary>Set by FleetViewModel so a chip tap can select this printer.</summary>
+    public Action? RequestSelect { get; set; }
+
+    [RelayCommand]
+    private void Select() => RequestSelect?.Invoke();
+
+    private static readonly Brush ChipSelBg = new SolidColorBrush(Color.FromArgb(0x10, 0xFF, 0xFF, 0xFF));
+    private static readonly Brush ChipSelBorder = new SolidColorBrush(Color.FromArgb(0x2E, 0xFF, 0xFF, 0xFF));
+    private static readonly Brush Clear = new SolidColorBrush(Colors.Transparent);
+    private static readonly Brush ChipNameSel = new SolidColorBrush(SpoolViewModel.Parse("#F3F4F6"));
+    private static readonly Brush ChipNameIdle = new SolidColorBrush(SpoolViewModel.Parse("#C9CDD4"));
+    private static readonly Brush ChipSubIdle = new SolidColorBrush(SpoolViewModel.Parse("#8A919C"));
+
+    public Brush ChipBackgroundBrush => IsSelected ? ChipSelBg : Clear;
+    public Brush ChipBorderBrush => IsSelected ? ChipSelBorder : Clear;
+    public Brush ChipNameBrush => IsSelected ? ChipNameSel : ChipNameIdle;
+    public Brush ChipSubBrush => IsSelected ? StatusBrush : ChipSubIdle;
+
+    public string ChipLine => _client.State.Status is PrinterStatus.Printing or PrinterStatus.Paused
+        ? $"{StatusLabel} · {PercentText}%"
+        : StatusLabel;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StopLabel))]
@@ -108,7 +142,9 @@ public partial class PrinterViewModel : ObservableObject
         StatusLabel = style.Label;
         StatusGlyph = style.Glyph;
         StatusBrush = new SolidColorBrush(SpoolViewModel.Parse(style.ColorHex));
-        StatusPillBrush = new SolidColorBrush(SpoolViewModel.Parse(style.ColorHex) { A = 0x3C });
+        var pillColor = SpoolViewModel.Parse(style.ColorHex);
+        pillColor.A = 0x3C;
+        StatusPillBrush = new SolidColorBrush(pillColor);
         JobName = s.JobName;
         MaterialLine = string.Join("  ·  ", new[] { s.Material, s.Plate, $"{s.LayerCurrent}/{s.LayerTotal} layers" }
             .Where(p => !string.IsNullOrEmpty(p)));
@@ -124,6 +160,9 @@ public partial class PrinterViewModel : ObservableObject
         ChamberText = s.ChamberC is null ? "-" : $"{s.ChamberC:0}°";
         FansText = $"{s.FanPartPct:0}%";
         FansSub = $"part · aux {s.FanAuxPct:0}%";
+        NozzleFrac01 = s.NozzleTargetC > 0 ? Math.Clamp(s.NozzleC / s.NozzleTargetC, 0, 1) : 0;
+        BedFrac01 = s.BedTargetC > 0 ? Math.Clamp(s.BedC / s.BedTargetC, 0, 1) : 0;
+        FanFrac01 = Math.Clamp(s.FanPartPct / 100.0, 0, 1);
         PauseLabel = s.Status == PrinterStatus.Paused ? "Resume" : "Pause";
         CanPause = s.Status is PrinterStatus.Printing or PrinterStatus.Paused;
         SpeedLabel = $"Speed: {s.Speed}";
@@ -149,12 +188,16 @@ public partial class PrinterViewModel : ObservableObject
         if (ams is not null)
         {
             AmsTitle = ams.Name.ToUpperInvariant();
+            FilamentHeader = $"FILAMENT · {AmsTitle}";
             AmsEnvText = ams.HumidityPct is null ? "" : $"{ams.HumidityPct:0}% RH · {ams.TemperatureC:0}°";
             Spools = ams.Spools.Select(sp => new SpoolViewModel(sp)).ToList();
             var active = ams.Spools.FirstOrDefault(sp => sp.Active);
             ActiveSpoolLine = active is null ? "" :
                 $"{active.Material} · {active.Remaining01 * 100:0}% left";
+            ActiveSpoolCaption = active is null ? "" :
+                $"Spool {active.Slot} · {active.Material} · active";
         }
         OnPropertyChanged(nameof(Spools));
+        OnPropertyChanged(nameof(ChipLine));
     }
 }

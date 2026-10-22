@@ -13,12 +13,21 @@ public partial class FleetViewModel : ObservableObject
         _fleet = fleet;
         Printers = new ObservableCollection<PrinterViewModel>(
             fleet.Printers.Select(p => new PrinterViewModel(p)));
+        foreach (var p in Printers)
+            p.RequestSelect = () => Selected = p;
         Selected = Printers.FirstOrDefault();
     }
 
     public ObservableCollection<PrinterViewModel> Printers { get; }
 
     [ObservableProperty] private PrinterViewModel? _selected;
+    [ObservableProperty] private string _updatedText = "Updated just now";
+
+    partial void OnSelectedChanged(PrinterViewModel? value)
+    {
+        foreach (var p in Printers)
+            p.IsSelected = ReferenceEquals(p, value);
+    }
 
     public string BusiestName => _fleet.Busiest?.Identity.Name ?? "";
 
