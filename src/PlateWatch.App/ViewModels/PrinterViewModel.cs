@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 using PlateWatch.Core;

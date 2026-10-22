@@ -6,7 +6,7 @@ namespace PlateWatch.App;
 public partial class App : Application
 {
     private DemoHost? _host;
-    private MainWindow? _window;
+    private TrayService? _tray;
 
     public App()
     {
@@ -17,8 +17,8 @@ public partial class App : Application
     {
         _host = new DemoHost();
         _host.Start();
-        // M2 demo: open the full window; the tray icon + popup arrive in the next slice.
-        _window = new MainWindow(_host.Fleet);
-        _window.Activate();
+        _tray = new TrayService(_host.Fleet);
+        // first launch shows the full window; afterwards it lives in the tray
+        _tray.ShowWindow();
     }
 }
