@@ -3,6 +3,7 @@ using H.NotifyIcon;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PlateWatch.App.ViewModels;
+using PlateWatch.Core;
 
 namespace PlateWatch.App.Services;
 
