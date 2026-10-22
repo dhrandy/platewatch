@@ -15,7 +15,10 @@ public sealed partial class SettingsWindow : Window
         InitializeComponent();
         Title = "PlateWatch Settings";
         SystemBackdrop = new MicaBackdrop();
-        AppWindow.Resize(new Windows.Graphics.SizeInt32(600, 720));
+        var appWindow = AppWindow;
+        if (IconFile.CurrentPath is not null)
+            appWindow.SetIcon(IconFile.CurrentPath);
+        appWindow.Resize(new Windows.Graphics.SizeInt32(600, 720));
 
         ToastsToggle.IsOn = _store.Settings.ToastsEnabled;
         PrintStartToggle.IsOn = _store.Settings.ToastOnPrintStart;

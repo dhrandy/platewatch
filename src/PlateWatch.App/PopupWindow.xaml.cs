@@ -18,6 +18,8 @@ public sealed partial class PopupWindow : Window
         SystemBackdrop = new MicaBackdrop();
 
         var appWindow = AppWindow;
+        if (IconFile.CurrentPath is not null)
+            appWindow.SetIcon(IconFile.CurrentPath);
         appWindow.Resize(new Windows.Graphics.SizeInt32(408, 620));
         if (appWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
         {

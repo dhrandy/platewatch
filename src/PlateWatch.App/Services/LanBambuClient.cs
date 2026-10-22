@@ -59,7 +59,7 @@ public sealed class LanBambuClient : IBambuClient, IDisposable
         }
     }
 
-    private Task OnDisconnected(MqttClientDisconnectedEventArgs _)
+    private Task OnDisconnected(MqttClientDisconnectedEventArgs args)
     {
         _ = RetryLoop();
         return Task.CompletedTask;

@@ -19,6 +19,8 @@ public sealed partial class MainWindow : Window
         SystemBackdrop = new MicaBackdrop();
 
         var appWindow = AppWindow;
+        if (IconFile.CurrentPath is not null)
+            appWindow.SetIcon(IconFile.CurrentPath);
         appWindow.Resize(new Windows.Graphics.SizeInt32(1000, 700));
         if (appWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
         {

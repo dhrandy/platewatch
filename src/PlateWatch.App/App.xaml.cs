@@ -19,6 +19,8 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         var settings = SettingsStore.Load();
+        // generate the .ico (windows + taskbar) before any window is created
+        IconFile.EnsureAsync().GetAwaiter().GetResult();
         Fleet coreFleet;
         if (settings.Settings.Printers.Count > 0)
         {

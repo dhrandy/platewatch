@@ -14,15 +14,14 @@ public static class TrayIconRenderer
 {
     public const int Size = 64;
 
-    public static WriteableBitmap Render(PrinterStatus status, double progress01, string colorHex)
+    public static byte[] RenderPixels(PrinterStatus status, double progress01, string colorHex)
     {
-        var bmp = new WriteableBitmap(Size, Size);
         var color = Parse(colorHex);
         var track = Color.FromArgb(0x26, 0xFF, 0xFF, 0xFF);
         var bg = Color.FromArgb(0xFF, 0x1B, 0x1B, 0x1B);
         var sweep = Math.Clamp(progress01, 0, 1) * 360.0;
 
-        using var stream = bmp.PixelBuffer.AsStream();
+        var pixels = new byte[Size * Size * 4];
         Span<byte> row = stackalloc byte[Size * 4];
         for (var y = 0; y < Size; y++)
         {
@@ -49,8 +48,17 @@ public static class TrayIconRenderer
                 }
                 WritePixel(row, x * 4, c ?? Color.FromArgb(0, 0, 0, 0));
             }
-            stream.Write(row);
+            row.CopyTo(pixels, y * Size * 4);
         }
+        return pixels;
+    }
+
+    public static WriteableBitmap Render(PrinterStatus status, double progress01, string colorHex)
+    {
+        var bmp = new WriteableBitmap(Size, Size);
+        var pixels = RenderPixels(status, progress01, colorHex);
+        using var stream = bmp.PixelBuffer.AsStream();
+        stream.Write(pixels);
         return bmp;
     }
 
