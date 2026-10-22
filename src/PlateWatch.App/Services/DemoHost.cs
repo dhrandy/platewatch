@@ -9,9 +9,9 @@ public sealed class DemoHost
 {
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(1) };
 
-    public DemoHost()
+    public DemoHost(Fleet fleet)
     {
-        Fleet = new FleetViewModel(DemoData.BuildFleet());
+        Fleet = new FleetViewModel(fleet);
         _timer.Tick += (_, _) => Fleet.TickAll(DateTimeOffset.Now);
     }
 
