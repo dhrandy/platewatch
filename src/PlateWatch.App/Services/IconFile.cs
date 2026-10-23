@@ -1,4 +1,3 @@
-using Windows.Graphics.Imaging;
 using PlateWatch.Core;
 
 namespace PlateWatch.App.Services;
@@ -7,12 +6,16 @@ namespace PlateWatch.App.Services;
 /// Writes the app icon (the tray-tile design, accent ring) to a real .ico
 /// under %APPDATA%/PlateWatch at startup, so windows and the taskbar get the
 /// icon without shipping binary assets in the repo. ICO wraps a PNG image.
+/// Synchronous and pure managed: the first version used WinRT's
+/// BitmapEncoder blocked with GetAwaiter().GetResult() on the UI thread,
+/// which deadlocked before any window or tray icon could appear (process
+/// stayed alive as a background process with zero UI).
 /// </summary>
 public static class IconFile
 {
     public static string? CurrentPath { get; private set; }
 
-    public static async Task EnsureAsync()
+    public static void Ensure()
     {
         if (CurrentPath is not null) return;
         var dir = Path.Combine(
@@ -22,14 +25,7 @@ public static class IconFile
 
         var pixels = TrayIconRenderer.RenderPixels(PrinterStatus.Printing, 0.66, DesignTokens.Accent);
         const int size = TrayIconRenderer.Size;
-
-        using var pngStream = new MemoryStream();
-        var encoder = await BitmapEncoder.CreateAsync(
-            BitmapEncoder.PngEncoderId, pngStream.AsRandomAccessStream());
-        encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
-            size, size, 96, 96, pixels);
-        await encoder.FlushAsync();
-        var png = pngStream.ToArray();
+        var png = PngEncoder.EncodePremultipliedBgra(pixels, size, size);
 
         using var ico = new BinaryWriter(File.Create(path));
         ico.Write((ushort)0);          // reserved
