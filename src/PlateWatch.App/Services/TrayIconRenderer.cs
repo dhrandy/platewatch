@@ -48,7 +48,7 @@ public static class TrayIconRenderer
                 }
                 WritePixel(row, x * 4, c ?? Color.FromArgb(0, 0, 0, 0));
             }
-            row.CopyTo(pixels, y * Size * 4);
+            row.CopyTo(pixels.AsSpan(y * Size * 4));
         }
         return pixels;
     }

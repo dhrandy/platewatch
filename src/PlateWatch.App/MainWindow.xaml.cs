@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using PlateWatch.App.Services;
 using Microsoft.UI.Xaml.Media;
 using PlateWatch.App.ViewModels;
 
