@@ -34,6 +34,13 @@ jobs:
           -p:Platform=x64
           -p:SelfContained=true
           -o publish
+      - name: List publish resource files
+        shell: pwsh
+        run: |
+          $pri = Get-ChildItem publish -Recurse -Include *.pri,*.xbf -File | Select-Object -ExpandProperty FullName
+          Write-Host "::warning::pri/xbf => $($pri -join ', ')"
+          $rt = Get-ChildItem publish -File | Where-Object { $_.Name -match 'WindowsAppRuntime|WindowsAppSDK|Microsoft.UI.Xaml' } | Select-Object -ExpandProperty Name
+          Write-Host "::warning::winappsdk files => $($rt -join ', ')"
       - name: Copy WinAppSDK insights resource dll (self-contained gap)
         shell: pwsh
         run: |

@@ -10,9 +10,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <!-- WinAppSDK bug (WindowsAppSDK#6248): the runtime derives the MRT
-         resources file name from the exe name; force the common name -->
-    <ProjectPriFileName>resources.pri</ProjectPriFileName>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <Platforms>x64</Platforms>
   </PropertyGroup>
