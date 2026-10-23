@@ -63,6 +63,10 @@ public partial class App : Application
         _host = new DemoHost(coreFleet);
         _host.Start();
 
+        // CI diagnostics: parse each MainWindow section separately (opt-in via env)
+        if (Environment.GetEnvironmentVariable("PLATEWATCH_XAML_PROBE") == "1")
+            Probes.XamlProbe.Run(_host.Fleet);
+
         try
         {
             _tray = new TrayService(_host.Fleet, settings);

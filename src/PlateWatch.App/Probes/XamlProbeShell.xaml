@@ -1,0 +1,5 @@
+<Window x:Class="PlateWatch.App.Probes.XamlProbeShell" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Padding="22">
+        <TextBlock Text="PlateWatch probe" FontSize="22" />
+    </Grid>
+</Window>

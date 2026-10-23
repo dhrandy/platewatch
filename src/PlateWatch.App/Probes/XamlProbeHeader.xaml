@@ -1,0 +1,51 @@
+<Window x:Class="PlateWatch.App.Probes.XamlProbeHeader" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:PlateWatch.App.ViewModels">
+    <Grid Padding="22" VerticalAlignment="Top">
+        <ItemsControl ItemsSource="{x:Bind Fleet.Printers, Mode=OneWay}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:PrinterViewModel">
+                    <Button Margin="0,0,10,0" Padding="0" Background="Transparent"
+                            BorderThickness="0"
+                            Command="{x:Bind SelectCommand}" CommandParameter="{x:Bind}">
+                        <Border Height="44" CornerRadius="10" Padding="14,0"
+                                Background="{x:Bind ChipBackgroundBrush, Mode=OneWay}"
+                                BorderBrush="{x:Bind ChipBorderBrush, Mode=OneWay}"
+                                BorderThickness="1">
+                            <Grid VerticalAlignment="Center" ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="24" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid Width="24" Height="24" VerticalAlignment="Center">
+                                    <Border CornerRadius="5" BorderBrush="#9AA0A6" BorderThickness="2" />
+                                    <Ellipse Width="8" Height="8" HorizontalAlignment="Right"
+                                             VerticalAlignment="Bottom" Margin="0,0,-3,-3"
+                                             Fill="{x:Bind StatusBrush, Mode=OneWay}"
+                                             Stroke="#1B1B1B" StrokeThickness="2" />
+                                </Grid>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{x:Bind ChipNameBrush, Mode=OneWay}" />
+                                    <TextBlock Text="{x:Bind ChipLine, Mode=OneWay}" FontSize="10"
+                                               Foreground="{x:Bind ChipSubBrush, Mode=OneWay}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                    VerticalAlignment="Center">
+            <TextBlock Text="{x:Bind Fleet.UpdatedText, Mode=OneWay}" FontSize="11"
+                       Foreground="#8A919C" VerticalAlignment="Center" Margin="0,0,8,0" />
+            <FontIcon Glyph="&#xE72C;" FontSize="12" Foreground="#8A919C" />
+        </StackPanel>
+    </Grid>
+</Window>

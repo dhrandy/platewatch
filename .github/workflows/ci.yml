@@ -55,6 +55,7 @@ jobs:
           # path, not an %APPDATA% override - read the log from there
           $logDir = "$env:USERPROFILE\AppData\Roaming\PlateWatch"
           Remove-Item $logDir -Recurse -Force -ErrorAction SilentlyContinue
+          $env:PLATEWATCH_XAML_PROBE = "1"
           try { $p = Start-Process $exe -PassThru -ErrorAction Stop }
           catch { Write-Host "::error::Start-Process failed: $_"; exit 1 }
           Start-Sleep -Seconds 12
