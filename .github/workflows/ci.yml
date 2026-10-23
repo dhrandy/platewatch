@@ -28,11 +28,10 @@ jobs:
         run: dotnet restore src/PlateWatch.App
       - name: Build WinUI 3 app
         run: dotnet build src/PlateWatch.App -c Release --no-restore -p:Platform=x64
-      - name: Publish single-file exe
+      - name: Publish self-contained app
         run: >-
           dotnet publish src/PlateWatch.App -c Release -r win-x64
-          -p:Platform=x64 -p:PublishSingleFile=true
-          -p:IncludeAllContentForSelfExtract=true
+          -p:Platform=x64
           -o publish
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
