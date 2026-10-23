@@ -51,6 +51,8 @@ jobs:
         run: |
           $exe = "publish\PlateWatch.App.exe"
           if (-not (Test-Path $exe)) { Write-Host "::error::publish exe missing"; exit 1 }
+          $key = (Get-ChildItem publish -File | Where-Object { $_.Extension -in '.pri','.xbf' -or $_.Name -match 'PlateWatch|resources' } | Select-Object -ExpandProperty Name) -join ', '
+          Write-Host "::warning::publish key files => $key
           # Environment.GetFolderPath(ApplicationData) resolves the real profile
           # path, not an %APPDATA% override - read the log from there
           $logDir = "$env:USERPROFILE\AppData\Roaming\PlateWatch"
