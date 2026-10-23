@@ -49,17 +49,22 @@ jobs:
       - name: Smoke test first launch
         shell: pwsh
         run: |
-          $env:APPDATA = "$env:RUNNER_TEMP\smoke-appdata"
-          New-Item -ItemType Directory -Force $env:APPDATA | Out-Null
-          $p = Start-Process "publish\PlateWatch.App.exe" -PassThru
+          $exe = "publish\PlateWatch.App.exe"
+          if (-not (Test-Path $exe)) { Write-Host "::error::publish exe missing"; exit 1 }
+          # Environment.GetFolderPath(ApplicationData) resolves the real profile
+          # path, not an %APPDATA% override - read the log from there
+          $logDir = "$env:USERPROFILE\AppData\Roaming\PlateWatch"
+          Remove-Item $logDir -Recurse -Force -ErrorAction SilentlyContinue
+          try { $p = Start-Process $exe -PassThru -ErrorAction Stop }
+          catch { Write-Host "::error::Start-Process failed: $_"; exit 1 }
           Start-Sleep -Seconds 12
-          $log = "$env:APPDATA\PlateWatch\startup.log"
+          $log = Join-Path $logDir "startup.log"
           $content = Get-Content $log -Raw -ErrorAction SilentlyContinue
-          Write-Host "::warning::startup.log => $($content -replace '\r?\n', ' | ')"
-          if ($p.HasExited) { Write-Error "app exited during smoke test (code $($p.ExitCode))"; exit 1 }
+          Write-Host "::warning::startup.log => $($content -replace '\r?\n', ' | ' -replace '%', '%25')"
+          if ($p.HasExited) { Write-Host "::error::app exited during smoke test (code $($p.ExitCode))"; exit 1 }
           Stop-Process -Id $p.Id -Force
-          if ($content -notmatch 'window shown') { Write-Error "window was not shown"; exit 1 }
-          if ($content -match 'ERROR') { Write-Error "startup log contains ERROR"; exit 1 }
+          if ($content -notmatch 'window shown') { Write-Host "::error::window was not shown"; exit 1 }
+          if ($content -match 'ERROR') { Write-Host "::error::startup log contains ERROR"; exit 1 }
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
         with:
