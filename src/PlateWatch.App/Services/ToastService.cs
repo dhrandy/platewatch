@@ -18,13 +18,16 @@ public sealed class ToastService : IDisposable
     public ToastService(Fleet fleet, SettingsStore settings, Action onInvoked)
     {
         _settings = settings;
+        // register before subscribing: if registration fails (a missing
+        // WinAppSDK resource dll on first run), no half-built service stays
+        // subscribed to fleet events
+        AppNotificationManager.Default.Register();
+        AppNotificationManager.Default.NotificationInvoked += (_, _) => onInvoked();
         foreach (var client in fleet.Printers)
         {
             _prev[client.Identity.Serial] = client.State.Clone();
             client.StateChanged += OnStateChanged;
         }
-        AppNotificationManager.Default.NotificationInvoked += (_, _) => onInvoked();
-        AppNotificationManager.Default.Register();
     }
 
     private void OnStateChanged(object? sender, EventArgs e)

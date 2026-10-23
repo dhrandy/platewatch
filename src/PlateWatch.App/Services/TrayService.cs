@@ -42,6 +42,7 @@ public sealed class TrayService : IDisposable
         if (_window is null)
         {
             _window = new MainWindow(_fleet);
+            StartupLog.Step("window created");
             _window.AppWindow.Closing += (_, args) =>
             {
                 // tray app: closing the window hides it; Quit exits

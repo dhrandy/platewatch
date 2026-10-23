@@ -34,6 +34,32 @@ jobs:
           -p:Platform=x64
           -p:SelfContained=true
           -o publish
+      - name: Copy WinAppSDK insights resource dll (self-contained gap)
+        shell: pwsh
+        run: |
+          $pkgRoot = "$env:USERPROFILE\.nuget\packages\microsoft.windowsappsdk.runtime"
+          $pkg = Get-ChildItem $pkgRoot | Sort-Object { [version]$_.Name } | Select-Object -Last 1
+          $msix = Join-Path $pkg.FullName "tools\MSIX\win10-x64\Microsoft.WindowsAppRuntime.2.msix"
+          $zip = "$env:RUNNER_TEMP\war.zip"
+          Copy-Item $msix $zip
+          $dst = "$env:RUNNER_TEMP\war-msix"
+          Expand-Archive $zip $dst -Force
+          Copy-Item (Join-Path $dst "Microsoft.WindowsAppRuntime.Insights.Resource.dll") publish\
+          if (-not (Test-Path "publish\Microsoft.WindowsAppRuntime.Insights.Resource.dll")) { Write-Error "insights resource dll copy failed"; exit 1 }
+      - name: Smoke test first launch
+        shell: pwsh
+        run: |
+          $env:APPDATA = "$env:RUNNER_TEMP\smoke-appdata"
+          New-Item -ItemType Directory -Force $env:APPDATA | Out-Null
+          $p = Start-Process "publish\PlateWatch.App.exe" -PassThru
+          Start-Sleep -Seconds 12
+          $log = "$env:APPDATA\PlateWatch\startup.log"
+          $content = Get-Content $log -Raw -ErrorAction SilentlyContinue
+          Write-Host "::warning::startup.log => $($content -replace '\r?\n', ' | ')"
+          if ($p.HasExited) { Write-Error "app exited during smoke test (code $($p.ExitCode))"; exit 1 }
+          Stop-Process -Id $p.Id -Force
+          if ($content -notmatch 'window shown') { Write-Error "window was not shown"; exit 1 }
+          if ($content -match 'ERROR') { Write-Error "startup log contains ERROR"; exit 1 }
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
         with:
