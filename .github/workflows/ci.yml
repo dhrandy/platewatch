@@ -32,6 +32,7 @@ jobs:
         run: >-
           dotnet publish src/PlateWatch.App -c Release -r win-x64
           -p:Platform=x64
+          -p:SelfContained=true
           -o publish
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
