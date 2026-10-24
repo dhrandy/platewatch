@@ -17,11 +17,13 @@ public sealed class LanBambuClient : IBambuClient, IDisposable
     private readonly IMqttClient _mqtt;
     private readonly string _accessCode;
     private readonly CancellationTokenSource _stop = new();
+    private int _retrying;
 
     public LanBambuClient(PrinterIdentity identity, string accessCode)
     {
         Identity = identity;
         _accessCode = accessCode;
+        State.Status = PrinterStatus.Offline; // until the first report says otherwise
         _mqtt = new MqttFactory().CreateMqttClient();
         _mqtt.ApplicationMessageReceivedAsync += OnMessage;
         _mqtt.DisconnectedAsync += OnDisconnected;
@@ -35,6 +37,21 @@ public sealed class LanBambuClient : IBambuClient, IDisposable
     {
         try
         {
+            await ConnectAndSubscribe();
+        }
+        catch
+        {
+            MarkOffline();
+            _ = RetryLoop();
+        }
+    }
+
+    private async Task ConnectAndSubscribe()
+    {
+        // bounded: a powered-off printer must fail fast, not hang a retry slot
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_stop.Token);
+        timeout.CancelAfter(TimeSpan.FromSeconds(8));
+        {
             var options = new MqttClientOptionsBuilder()
                 .WithTcpServer(Identity.IpAddress, 8883)
                 .WithCredentials("bblp", _accessCode)
@@ -46,33 +63,52 @@ public sealed class LanBambuClient : IBambuClient, IDisposable
                     IgnoreCertificateRevocationErrors = true,
                 })
                 .Build();
-            await _mqtt.ConnectAsync(options, _stop.Token);
+            await _mqtt.ConnectAsync(options, timeout.Token);
             await _mqtt.SubscribeAsync(new MqttClientSubscribeOptionsBuilder()
                 .WithTopicFilter(f => f.WithTopic($"device/{Identity.Serial}/report"))
-                .Build(), _stop.Token);
+                .Build(), timeout.Token);
             await SendAsync("{\"pushing\":{\"sequence_id\":\"0\",\"command\":\"pushall\"}}");
         }
-        catch
-        {
-            // stays Idle; the disconnect handler keeps retrying
-            _ = RetryLoop();
-        }
+    }
+
+    private void MarkOffline()
+    {
+        if (_stop.IsCancellationRequested) return;
+        if (State.Status == PrinterStatus.Offline) return;
+        State.Status = PrinterStatus.Offline;
+        State.LastUpdated = DateTimeOffset.UtcNow;
+        StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private Task OnDisconnected(MqttClientDisconnectedEventArgs args)
     {
-        _ = RetryLoop();
+        if (!_stop.IsCancellationRequested)
+        {
+            MarkOffline();
+            _ = RetryLoop();
+        }
         return Task.CompletedTask;
     }
 
+    // single-flight: only one retry loop ever runs, no matter how many
+    // disconnect events fire (previously every failure spawned another loop,
+    // and they multiplied while the printer stayed off)
     private async Task RetryLoop()
     {
-        while (!_stop.IsCancellationRequested && !_mqtt.IsConnected)
+        if (Interlocked.Exchange(ref _retrying, 1) == 1) return;
+        try
         {
-            await Task.Delay(TimeSpan.FromSeconds(5), _stop.Token).ContinueWith(_ => { });
-            if (_stop.IsCancellationRequested) return;
-            try { await StartAsync(); }
-            catch { /* retry again */ }
+            while (!_stop.IsCancellationRequested && !_mqtt.IsConnected)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5)).ContinueWith(_ => { });
+                if (_stop.IsCancellationRequested) return;
+                try { await ConnectAndSubscribe(); }
+                catch { MarkOffline(); }
+            }
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _retrying, 0);
         }
     }
 

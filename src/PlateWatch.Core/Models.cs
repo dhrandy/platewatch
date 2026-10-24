@@ -1,7 +1,7 @@
 namespace PlateWatch.Core;
 
 /// <summary>Printer lifecycle states. Style is color + glyph + word, never color alone.</summary>
-public enum PrinterStatus { Printing, Paused, Finished, Error, Idle }
+public enum PrinterStatus { Printing, Paused, Finished, Error, Idle, Offline }
 
 public enum PrintSpeed { Silent, Standard, Sport, Ludicrous }
 

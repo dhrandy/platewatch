@@ -11,11 +11,19 @@ namespace PlateWatch.App.ViewModels;
 public partial class PrinterViewModel : ObservableObject
 {
     private readonly IBambuClient _client;
+    private readonly Microsoft.UI.Dispatching.DispatcherQueue _ui =
+        Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
     public PrinterViewModel(IBambuClient client)
     {
         _client = client;
-        _client.StateChanged += (_, _) => Refresh();
+        // real printers raise StateChanged from MQTT threads; view updates
+        // must happen on the UI thread
+        _client.StateChanged += (_, _) =>
+        {
+            if (_ui.HasThreadAccess) Refresh();
+            else _ui.TryEnqueue(() => Refresh());
+        };
         Refresh();
     }
 
@@ -195,7 +203,7 @@ public partial class PrinterViewModel : ObservableObject
         }
         else
         {
-            TimeLeftText = "Nothing printing";
+            TimeLeftText = s.Status == PrinterStatus.Offline ? "Printer offline" : "Nothing printing";
             FinishText = "";
         }
 

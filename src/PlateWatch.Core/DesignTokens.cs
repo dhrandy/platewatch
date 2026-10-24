@@ -27,6 +27,7 @@ public static class DesignTokens
             [PrinterStatus.Finished] = new("#009E73", "✓", "Finished"),        // bluish green
             [PrinterStatus.Error]    = new("#D55E00", "!", "Needs attention"), // vermillion
             [PrinterStatus.Idle]     = new("#9AA0A6", "○", "Idle"),            // neutral gray
+            [PrinterStatus.Offline]  = new("#6B7280", "◌", "Offline"),         // dim gray
         };
 
     public static StatusStyle StyleFor(PrinterStatus status) => Styles[status];
