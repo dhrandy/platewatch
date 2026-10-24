@@ -246,7 +246,8 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Border Grid.Column="0" CornerRadius="8" Background="#08FFFFFF" Padding="14,10">
+                            <Border Grid.Column="0" CornerRadius="8" Background="#08FFFFFF" Padding="14,10"
+                                    Visibility="{x:Bind controls:Converters.BoolToVis(Fleet.Selected.HasChamber), Mode=OneWay}">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
@@ -260,7 +261,8 @@
                                     <TextBlock Grid.Row="2" Text="read only" FontSize="9" Foreground="#6B7280" />
                                 </Grid>
                             </Border>
-                            <Border Grid.Column="1" CornerRadius="8" Background="#08FFFFFF" Padding="14,10">
+                            <Border Grid.Column="1" Grid.ColumnSpan="{x:Bind Fleet.Selected.FansColumnSpan, Mode=OneWay}"
+                                    CornerRadius="8" Background="#08FFFFFF" Padding="14,10">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
@@ -285,9 +287,10 @@
                     </Grid>
                 </Border>
 
-                <!-- filament card -->
+                <!-- filament card (hidden when the printer has no AMS) -->
                 <Border Grid.Row="1" CornerRadius="12" Background="#0BFFFFFF"
-                        BorderBrush="#12FFFFFF" BorderThickness="1" Padding="20,18">
+                        BorderBrush="#12FFFFFF" BorderThickness="1" Padding="20,18"
+                        Visibility="{x:Bind controls:Converters.BoolToVis(Fleet.Selected.HasAms), Mode=OneWay}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />

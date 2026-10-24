@@ -17,14 +17,20 @@ public sealed class TrayService : IDisposable
     private readonly TaskbarIcon _icon;
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(1) };
     private readonly SettingsStore _settings;
+    private readonly Action? _applyFleet;
+    private readonly Action? _onQuit;
     private MainWindow? _window;
     private PopupWindow? _popup;
     private SettingsWindow? _settingsWindow;
+    private bool _quitting;
 
-    public TrayService(FleetViewModel fleet, SettingsStore settings)
+    public TrayService(FleetViewModel fleet, SettingsStore settings,
+        Action? applyFleet = null, Action? onQuit = null)
     {
         _fleet = fleet;
         _settings = settings;
+        _applyFleet = applyFleet;
+        _onQuit = onQuit;
         _icon = new TaskbarIcon
         {
             ToolTipText = "PlateWatch",
@@ -45,7 +51,11 @@ public sealed class TrayService : IDisposable
             StartupLog.Step("window created");
             _window.AppWindow.Closing += (_, args) =>
             {
-                // tray app: closing the window hides it; Quit exits
+                // tray app: closing the window hides it; Quit exits.
+                // during a real quit the close must go through, or
+                // Application.Exit() gets cancelled here and the process
+                // stays alive in the background.
+                if (_quitting) return;
                 args.Cancel = true;
                 _window.AppWindow.Hide();
             };
@@ -66,7 +76,7 @@ public sealed class TrayService : IDisposable
     {
         if (_settingsWindow is null)
         {
-            _settingsWindow = new SettingsWindow(_settings);
+            _settingsWindow = new SettingsWindow(_settings, _applyFleet);
             _settingsWindow.Closed += (_, _) => _settingsWindow = null;
         }
         _settingsWindow.AppWindow.Show();
@@ -81,7 +91,7 @@ public sealed class TrayService : IDisposable
         menu.Items.Add(new MenuFlyoutItem { Text = "Settings…", Command = new RelayCommand(ShowSettings) });
         menu.Items.Add(new MenuFlyoutSeparator());
         var quit = new MenuFlyoutItem { Text = "Quit" };
-        quit.Click += (_, _) => Application.Current.Exit();
+        quit.Click += (_, _) => Quit();
         menu.Items.Add(quit);
         return menu;
     }
@@ -123,6 +133,15 @@ public sealed class TrayService : IDisposable
             (s.Status is PlateWatch.Core.PrinterStatus.Printing or PlateWatch.Core.PrinterStatus.Paused
                 ? $" {p.PercentText}%"
                 : "");
+    }
+
+    private void Quit()
+    {
+        _quitting = true;
+        _timer.Stop();
+        _icon.Dispose();
+        _onQuit?.Invoke();
+        Application.Current.Exit();
     }
 
     public void Dispose()

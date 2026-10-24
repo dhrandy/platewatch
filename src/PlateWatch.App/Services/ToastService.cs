@@ -13,6 +13,7 @@ public sealed class ToastService : IDisposable
 {
     private readonly NotificationPolicy _policy = new() { EnablePrintStarted = true };
     private readonly Dictionary<string, PrinterState> _prev = new();
+    private readonly List<IBambuClient> _subscribed = new();
     private readonly SettingsStore _settings;
 
     public ToastService(Fleet fleet, SettingsStore settings, Action onInvoked)
@@ -23,11 +24,27 @@ public sealed class ToastService : IDisposable
         // subscribed to fleet events
         AppNotificationManager.Default.Register();
         AppNotificationManager.Default.NotificationInvoked += (_, _) => onInvoked();
+        Subscribe(fleet);
+    }
+
+    private void Subscribe(Fleet fleet)
+    {
         foreach (var client in fleet.Printers)
         {
             _prev[client.Identity.Serial] = client.State.Clone();
             client.StateChanged += OnStateChanged;
+            _subscribed.Add(client);
         }
+    }
+
+    /// <summary>Moves the watch to a new fleet (settings saved).</summary>
+    public void ReplaceFleet(Fleet fleet)
+    {
+        foreach (var client in _subscribed)
+            client.StateChanged -= OnStateChanged;
+        _subscribed.Clear();
+        _prev.Clear();
+        Subscribe(fleet);
     }
 
     private void OnStateChanged(object? sender, EventArgs e)

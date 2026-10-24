@@ -10,6 +10,7 @@ public partial class App : Application
     private TrayService? _tray;
     private ToastService? _toasts;
     private List<LanBambuClient>? _realClients;
+    private SettingsStore? _settings;
 
     public App()
     {
@@ -42,6 +43,7 @@ public partial class App : Application
         try
         {
         var settings = SettingsStore.Load();
+        _settings = settings;
         StartupLog.Step("settings loaded");
         // generate the .ico (windows + taskbar) before any window is created;
         // icon failure must never take down startup
@@ -81,7 +83,7 @@ public partial class App : Application
 
         try
         {
-            _tray = new TrayService(_host.Fleet, settings);
+            _tray = new TrayService(_host.Fleet, settings, ApplyFleetFromSettings, CleanupBeforeQuit);
             StartupLog.Step("tray ready");
         }
         catch (Exception ex)
@@ -118,6 +120,61 @@ public partial class App : Application
         {
             StartupLog.Write(ex);
             throw;
+        }
+    }
+
+    /// <summary>Rebuilds the fleet from saved settings (real printers or demo)
+    /// and reconnects, so Settings changes apply without a restart.</summary>
+    private void ApplyFleetFromSettings()
+    {
+        if (_settings is null || _host is null) return;
+        try
+        {
+            if (_realClients is not null)
+            {
+                foreach (var c in _realClients) c.Dispose();
+                _realClients = null;
+            }
+
+            Fleet coreFleet;
+            if (_settings.Settings.Printers.Count > 0)
+            {
+                _realClients = _settings.Settings.Printers.Select(p => new LanBambuClient(
+                    new PrinterIdentity(p.Name, p.Model, p.Serial, p.IpAddress, Firmware: ""),
+                    string.IsNullOrEmpty(p.AccessCodeProtected)
+                        ? ""
+                        : SettingsStore.UnprotectSecret(p.AccessCodeProtected))).ToList();
+                coreFleet = new Fleet(_realClients);
+                foreach (var c in _realClients)
+                    _ = c.StartAsync();
+            }
+            else
+            {
+                coreFleet = DemoData.BuildFleet();
+            }
+
+            _host.Fleet.ReplaceFleet(coreFleet);
+            _toasts?.ReplaceFleet(coreFleet);
+            StartupLog.Step("fleet rebuilt from settings");
+        }
+        catch (Exception ex)
+        {
+            StartupLog.Write(ex);
+        }
+    }
+
+    /// <summary>Stops background work (MQTT clients, toast registration) on real quit.</summary>
+    private void CleanupBeforeQuit()
+    {
+        try
+        {
+            if (_realClients is not null)
+                foreach (var c in _realClients) c.Dispose();
+            _toasts?.Dispose();
+        }
+        catch
+        {
+            // quitting: never block exit on cleanup
         }
     }
 }

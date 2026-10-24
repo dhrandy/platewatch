@@ -6,15 +6,31 @@ namespace PlateWatch.App.ViewModels;
 
 public partial class FleetViewModel : ObservableObject
 {
-    private readonly Fleet _fleet;
+    private Fleet _fleet;
 
     public FleetViewModel(Fleet fleet)
     {
         _fleet = fleet;
-        Printers = new ObservableCollection<PrinterViewModel>(
-            fleet.Printers.Select(p => new PrinterViewModel(p)));
-        foreach (var p in Printers)
+        Printers = new ObservableCollection<PrinterViewModel>();
+        RebuildPrinters();
+    }
+
+    /// <summary>Swaps the underlying fleet in place (settings saved) without
+    /// recreating this view model, so windows and the tray keep their bindings.</summary>
+    public void ReplaceFleet(Fleet fleet)
+    {
+        _fleet = fleet;
+        RebuildPrinters();
+    }
+
+    private void RebuildPrinters()
+    {
+        Printers.Clear();
+        foreach (var p in _fleet.Printers.Select(c => new PrinterViewModel(c)))
+        {
             p.RequestSelect = () => Selected = p;
+            Printers.Add(p);
+        }
         Selected = Printers.FirstOrDefault();
     }
 

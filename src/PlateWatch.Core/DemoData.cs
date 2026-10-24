@@ -45,6 +45,7 @@ public static class DemoData
             Identity = new PrinterIdentity("X1C (demo)", "Bambu Lab X1 Carbon", "DEMO-X1C-003",
                                            "192.168.1.53", "01.06.05.00"),
             Status = PrinterStatus.Finished,
+            ChamberC = 40,
             JobName = "Planter",
             Material = "PETG",
             InitialProgress = 1.0,

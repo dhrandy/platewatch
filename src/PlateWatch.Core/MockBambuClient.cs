@@ -13,7 +13,7 @@ public sealed class MockPrinterSpec
     public double TimeScale { get; init; } = 8;   // demo speed: 1 real second = 8 print seconds
     public double NozzleC { get; init; } = 220;
     public double BedC { get; init; } = 55;
-    public double? ChamberC { get; init; } = 38;
+    public double? ChamberC { get; init; }  // null = no chamber sensor (A1/A1 mini)
     public double FanPartPct { get; init; } = 90;
     public double FanAuxPct { get; init; } = 40;
     public string FilamentColorHex { get; init; } = "#E69F00";

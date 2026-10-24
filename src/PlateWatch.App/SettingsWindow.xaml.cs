@@ -8,10 +8,13 @@ namespace PlateWatch.App;
 public sealed partial class SettingsWindow : Window
 {
     private readonly SettingsStore _store;
+    private readonly Action? _applyFleet;
+    private PrinterConfig? _editing;
 
-    public SettingsWindow(SettingsStore store)
+    public SettingsWindow(SettingsStore store, Action? applyFleet = null)
     {
         _store = store;
+        _applyFleet = applyFleet;
         InitializeComponent();
         Title = "PlateWatch Settings";
         SystemBackdrop = new MicaBackdrop();
@@ -49,7 +52,7 @@ public sealed partial class SettingsWindow : Window
         _store.Save();
     }
 
-    private void OnAddPrinter(object sender, RoutedEventArgs e)
+    private void OnSavePrinter(object sender, RoutedEventArgs e)
     {
         if (string.IsNullOrWhiteSpace(NameBox.Text) || string.IsNullOrWhiteSpace(IpBox.Text)
             || string.IsNullOrWhiteSpace(SerialBox.Text))
@@ -59,18 +62,68 @@ public sealed partial class SettingsWindow : Window
             return;
         }
         AddError.Visibility = Visibility.Collapsed;
-        _store.Settings.Printers.Add(new PrinterConfig
+        if (_editing is not null)
         {
-            Name = NameBox.Text.Trim(),
-            Model = ModelBox.Text.Trim(),
-            IpAddress = IpBox.Text.Trim(),
-            Serial = SerialBox.Text.Trim(),
-            AccessCodeProtected = string.IsNullOrEmpty(AccessCodeBox.Password)
-                ? ""
-                : SettingsStore.ProtectSecret(AccessCodeBox.Password),
-        });
+            _editing.Name = NameBox.Text.Trim();
+            _editing.Model = ModelBox.Text.Trim();
+            _editing.IpAddress = IpBox.Text.Trim();
+            _editing.Serial = SerialBox.Text.Trim();
+            // blank access code on edit keeps the stored one
+            if (!string.IsNullOrEmpty(AccessCodeBox.Password))
+                _editing.AccessCodeProtected = SettingsStore.ProtectSecret(AccessCodeBox.Password);
+        }
+        else
+        {
+            _store.Settings.Printers.Add(new PrinterConfig
+            {
+                Name = NameBox.Text.Trim(),
+                Model = ModelBox.Text.Trim(),
+                IpAddress = IpBox.Text.Trim(),
+                Serial = SerialBox.Text.Trim(),
+                AccessCodeProtected = string.IsNullOrEmpty(AccessCodeBox.Password)
+                    ? ""
+                    : SettingsStore.ProtectSecret(AccessCodeBox.Password),
+            });
+        }
         _store.Save();
-        NameBox.Text = ModelBox.Text = IpBox.Text = SerialBox.Text = AccessCodeBox.Password = "";
+        ResetForm();
         RefreshPrinterList();
+        _applyFleet?.Invoke();
+    }
+
+    private void OnEditPrinter(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is not PrinterConfig printer) return;
+        _editing = printer;
+        NameBox.Text = printer.Name;
+        ModelBox.Text = printer.Model;
+        IpBox.Text = printer.IpAddress;
+        SerialBox.Text = printer.Serial;
+        AccessCodeBox.Password = "";
+        FormHeader.Text = "Edit printer (blank access code keeps the saved one)";
+        AddButton.Content = "Save changes";
+        CancelEditButton.Visibility = Visibility.Visible;
+    }
+
+    private void OnDeletePrinter(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is not PrinterConfig printer) return;
+        if (ReferenceEquals(_editing, printer)) ResetForm();
+        _store.Settings.Printers.Remove(printer);
+        _store.Save();
+        RefreshPrinterList();
+        _applyFleet?.Invoke();
+    }
+
+    private void OnCancelEdit(object sender, RoutedEventArgs e) => ResetForm();
+
+    private void ResetForm()
+    {
+        _editing = null;
+        NameBox.Text = ModelBox.Text = IpBox.Text = SerialBox.Text = AccessCodeBox.Password = "";
+        FormHeader.Text = "Add a printer (LAN mode)";
+        AddButton.Content = "Add printer";
+        CancelEditButton.Visibility = Visibility.Collapsed;
+        AddError.Visibility = Visibility.Collapsed;
     }
 }

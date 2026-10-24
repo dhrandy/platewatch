@@ -56,6 +56,19 @@ public partial class PrinterViewModel : ObservableObject
     [ObservableProperty] private string _activeSpoolCaption = "";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FansColumnSpan))]
+    [NotifyPropertyChangedFor(nameof(PopupFansColumn))]
+    [NotifyPropertyChangedFor(nameof(PopupFansColumnSpan))]
+    private bool _hasChamber = true;
+
+    [ObservableProperty] private bool _hasAms;
+
+    // layout: without a chamber card the fans card takes its space
+    public int FansColumnSpan => HasChamber ? 1 : 2;
+    public int PopupFansColumn => HasChamber ? 3 : 2;
+    public int PopupFansColumnSpan => HasChamber ? 1 : 2;
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ChipBackgroundBrush))]
     [NotifyPropertyChangedFor(nameof(ChipBorderBrush))]
     [NotifyPropertyChangedFor(nameof(ChipNameBrush))]
@@ -159,6 +172,7 @@ public partial class PrinterViewModel : ObservableObject
         BedText = $"{s.BedC:0}°";
         BedSub = $"at {s.BedTargetC:0}°";
         ChamberText = s.ChamberC is null ? "-" : $"{s.ChamberC:0}°";
+        HasChamber = s.ChamberC.HasValue;
         FansText = $"{s.FanPartPct:0}%";
         FansSub = $"part · aux {s.FanAuxPct:0}%";
         NozzleFrac01 = s.NozzleTargetC > 0 ? Math.Clamp(s.NozzleC / s.NozzleTargetC, 0, 1) : 0;
@@ -186,6 +200,7 @@ public partial class PrinterViewModel : ObservableObject
         }
 
         var ams = s.AmsUnits.FirstOrDefault();
+        HasAms = ams is not null;
         if (ams is not null)
         {
             AmsTitle = ams.Name.ToUpperInvariant();

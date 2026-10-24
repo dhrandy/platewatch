@@ -24,17 +24,28 @@
 
             <StackPanel Spacing="8">
                 <TextBlock Text="PRINTERS" FontSize="9" FontWeight="SemiBold" Foreground="#6B7280" />
-                <ListView x:Name="PrinterList" MaxHeight="180">
+                <ListView x:Name="PrinterList" MaxHeight="180" SelectionMode="None">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="services:PrinterConfig">
-                            <StackPanel Padding="0,4">
-                                <TextBlock FontSize="13" FontWeight="SemiBold">
-                                    <Run Text="{x:Bind Name}" /><Run Text="  ·  " /><Run Text="{x:Bind Model}" />
-                                </TextBlock>
-                                <TextBlock FontSize="11" Foreground="#8A919C">
-                                    <Run Text="{x:Bind IpAddress}" /><Run Text="  ·  " /><Run Text="{x:Bind Serial}" />
-                                </TextBlock>
-                            </StackPanel>
+                            <Grid Padding="0,4" ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock FontSize="13" FontWeight="SemiBold">
+                                        <Run Text="{x:Bind Name}" /><Run Text="  ·  " /><Run Text="{x:Bind Model}" />
+                                    </TextBlock>
+                                    <TextBlock FontSize="11" Foreground="#8A919C">
+                                        <Run Text="{x:Bind IpAddress}" /><Run Text="  ·  " /><Run Text="{x:Bind Serial}" />
+                                    </TextBlock>
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="Edit" FontSize="11" Padding="10,4"
+                                        VerticalAlignment="Center" Tag="{x:Bind}" Click="OnEditPrinter" />
+                                <Button Grid.Column="2" Content="Delete" FontSize="11" Padding="10,4"
+                                        VerticalAlignment="Center" Tag="{x:Bind}" Click="OnDeletePrinter" />
+                            </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
@@ -42,15 +53,19 @@
                 <Border CornerRadius="10" Background="#0BFFFFFF" BorderBrush="#12FFFFFF"
                         BorderThickness="1" Padding="16">
                     <StackPanel Spacing="10">
-                        <TextBlock Text="Add a printer (LAN mode)" FontWeight="SemiBold" />
+                        <TextBlock x:Name="FormHeader" Text="Add a printer (LAN mode)" FontWeight="SemiBold" />
                         <TextBox x:Name="NameBox" PlaceholderText="Name (e.g. P1S)" />
                         <TextBox x:Name="ModelBox" PlaceholderText="Model (e.g. Bambu Lab P1S)" />
                         <TextBox x:Name="IpBox" PlaceholderText="IP address" />
                         <TextBox x:Name="SerialBox" PlaceholderText="Serial number" />
                         <PasswordBox x:Name="AccessCodeBox" PlaceholderText="Access code (stored encrypted)" />
-                        <Button Content="Add printer" Click="OnAddPrinter"
-                                HorizontalAlignment="Right" Background="#4CC2FF" Foreground="#14222E"
-                                FontWeight="SemiBold" CornerRadius="6" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <Button x:Name="CancelEditButton" Content="Cancel" Click="OnCancelEdit"
+                                    Visibility="Collapsed" CornerRadius="6" />
+                            <Button x:Name="AddButton" Content="Add printer" Click="OnSavePrinter"
+                                    Background="#4CC2FF" Foreground="#14222E"
+                                    FontWeight="SemiBold" CornerRadius="6" />
+                        </StackPanel>
                         <TextBlock x:Name="AddError" FontSize="11" Foreground="#E69F00"
                                    Visibility="Collapsed" />
                     </StackPanel>

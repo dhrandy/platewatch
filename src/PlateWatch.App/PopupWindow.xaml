@@ -129,14 +129,17 @@
                     <TextBlock Text="{x:Bind ViewModel.BedSub, Mode=OneWay}" FontSize="8" Foreground="#6B7280" />
                 </StackPanel>
             </Border>
-            <Border Grid.Column="2" CornerRadius="8" Background="#09FFFFFF" Padding="9,8">
+            <Border Grid.Column="2" CornerRadius="8" Background="#09FFFFFF" Padding="9,8"
+                    Visibility="{x:Bind controls:Converters.BoolToVis(ViewModel.HasChamber), Mode=OneWay}">
                 <StackPanel>
                     <TextBlock Text="Chamber" FontSize="9" Foreground="#8A919C" />
                     <TextBlock Text="{x:Bind ViewModel.ChamberText, Mode=OneWay}" FontSize="14" FontWeight="SemiBold" />
                     <TextBlock Text="read only" FontSize="8" Foreground="#6B7280" />
                 </StackPanel>
             </Border>
-            <Border Grid.Column="3" CornerRadius="8" Background="#09FFFFFF" Padding="9,8">
+            <Border Grid.Column="{x:Bind ViewModel.PopupFansColumn, Mode=OneWay}"
+                    Grid.ColumnSpan="{x:Bind ViewModel.PopupFansColumnSpan, Mode=OneWay}"
+                    CornerRadius="8" Background="#09FFFFFF" Padding="9,8">
                 <StackPanel>
                     <TextBlock Text="Fans" FontSize="9" Foreground="#8A919C" />
                     <TextBlock Text="{x:Bind ViewModel.FansText, Mode=OneWay}" FontSize="14" FontWeight="SemiBold" />
@@ -146,13 +149,14 @@
         </Grid>
 
         <!-- AMS -->
-        <Grid Grid.Row="5">
+        <Grid Grid.Row="5" Visibility="{x:Bind controls:Converters.BoolToVis(ViewModel.HasAms), Mode=OneWay}">
             <TextBlock Text="{x:Bind ViewModel.AmsTitle, Mode=OneWay}" FontSize="9" FontWeight="SemiBold"
                        Foreground="#6B7280" />
             <TextBlock Text="{x:Bind ViewModel.AmsEnvText, Mode=OneWay}" FontSize="10"
                        Foreground="#8A919C" HorizontalAlignment="Right" />
         </Grid>
-        <StackPanel Grid.Row="6" Orientation="Horizontal">
+        <StackPanel Grid.Row="6" Orientation="Horizontal"
+                    Visibility="{x:Bind controls:Converters.BoolToVis(ViewModel.HasAms), Mode=OneWay}">
             <ItemsControl ItemsSource="{x:Bind ViewModel.Spools, Mode=OneWay}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:SpoolViewModel">
