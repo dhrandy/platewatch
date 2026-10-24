@@ -19,10 +19,10 @@
         <!-- header -->
         <Grid Grid.Row="0">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Width="26" Height="22" CornerRadius="4" BorderBrush="#C9CDD4" BorderThickness="2" />
+                <Border Width="26" Height="22" CornerRadius="4" BorderBrush="{ThemeResource PwTextSecondary}" BorderThickness="2" />
                 <TextBlock Text="{x:Bind ViewModel.Name, Mode=OneWay}" Margin="10,0,0,0"
                            VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" />
-                <FontIcon Glyph="&#xE70D;" FontSize="10" Foreground="#8A919C" Margin="8,2,0,0" />
+                <FontIcon Glyph="&#xE70D;" FontSize="10" Foreground="{ThemeResource PwTextMuted}" Margin="8,2,0,0" />
             </StackPanel>
             <Border HorizontalAlignment="Right" VerticalAlignment="Center" CornerRadius="12"
                     Background="{x:Bind ViewModel.StatusPillBrush, Mode=OneWay}" Padding="10,4">
@@ -38,7 +38,7 @@
         </Grid>
 
         <!-- hero card -->
-        <Border Grid.Row="1" CornerRadius="10" Background="#0CFFFFFF" BorderBrush="#12FFFFFF"
+        <Border Grid.Row="1" CornerRadius="10" Background="{ThemeResource PwCardFill}" BorderBrush="{ThemeResource PwCardBorder}"
                 BorderThickness="1" Padding="14">
             <Grid ColumnSpacing="14">
                 <Grid.ColumnDefinitions>
@@ -59,21 +59,21 @@
                     <TextBlock Grid.Row="0" Text="{x:Bind ViewModel.JobName, Mode=OneWay}"
                                FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                     <TextBlock Grid.Row="1" Text="{x:Bind ViewModel.MaterialLine, Mode=OneWay}"
-                               FontSize="11" Foreground="#8A919C" TextTrimming="CharacterEllipsis" />
+                               FontSize="11" Foreground="{ThemeResource PwTextMuted}" TextTrimming="CharacterEllipsis" />
                     <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,4,0,0">
                         <TextBlock Text="{x:Bind ViewModel.PercentText, Mode=OneWay}"
                                    FontSize="34" FontWeight="SemiBold" />
                         <TextBlock Text="%" FontSize="18" FontWeight="SemiBold"
-                                   Foreground="#A7ABB3" Margin="4,0,0,10" />
+                                   Foreground="{ThemeResource PwTextSecondary}" Margin="4,0,0,10" />
                     </StackPanel>
                     <ProgressBar Grid.Row="3" Margin="0,6,0,0" Minimum="0" Maximum="1" Height="6"
                                  Value="{x:Bind ViewModel.Progress01, Mode=OneWay}"
                                  Foreground="{x:Bind ViewModel.FilamentBrush, Mode=OneWay}" />
                     <Grid Grid.Row="4" Margin="0,4,0,0">
                         <TextBlock Text="{x:Bind ViewModel.TimeLeftText, Mode=OneWay}" FontSize="11"
-                                   Foreground="#C9CDD4" />
+                                   Foreground="{ThemeResource PwTextSecondary}" />
                         <TextBlock Text="{x:Bind ViewModel.FinishText, Mode=OneWay}" FontSize="11"
-                                   Foreground="#C9CDD4" HorizontalAlignment="Right" />
+                                   Foreground="{ThemeResource PwTextSecondary}" HorizontalAlignment="Right" />
                     </Grid>
                 </Grid>
             </Grid>
@@ -99,15 +99,15 @@
                     Foreground="{x:Bind ViewModel.StopForegroundBrush, Mode=OneWay}" />
             <Button Grid.Column="2" Content="{x:Bind ViewModel.LightLabel, Mode=OneWay}"
                     HorizontalAlignment="Stretch" CornerRadius="6" FontSize="11"
-                    Command="{x:Bind ViewModel.ToggleLightCommand}" Background="#14FFFFFF" />
+                    Command="{x:Bind ViewModel.ToggleLightCommand}" Background="{ThemeResource PwControlFill}" />
             <Button Grid.Column="3" Content="{x:Bind ViewModel.SpeedLabel, Mode=OneWay}"
                     HorizontalAlignment="Stretch" CornerRadius="6" FontSize="11"
-                    Command="{x:Bind ViewModel.CycleSpeedCommand}" Background="#14FFFFFF" />
+                    Command="{x:Bind ViewModel.CycleSpeedCommand}" Background="{ThemeResource PwControlFill}" />
         </Grid>
 
         <!-- temps & airflow -->
         <TextBlock Grid.Row="3" Text="TEMPERATURES &amp; AIRFLOW" FontSize="9" FontWeight="SemiBold"
-                   Foreground="#6B7280" Margin="0,2,0,0" />
+                   Foreground="{ThemeResource PwTextDim}" Margin="0,2,0,0" />
         <Grid Grid.Row="4" ColumnSpacing="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -115,35 +115,35 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" CornerRadius="8" Background="#09FFFFFF" Padding="9,8">
+            <Border Grid.Column="0" CornerRadius="8" Background="{ThemeResource PwSubCardFill}" Padding="9,8">
                 <StackPanel>
-                    <TextBlock Text="Nozzle" FontSize="9" Foreground="#8A919C" />
+                    <TextBlock Text="Nozzle" FontSize="9" Foreground="{ThemeResource PwTextMuted}" />
                     <TextBlock Text="{x:Bind ViewModel.NozzleText, Mode=OneWay}" FontSize="14" FontWeight="SemiBold" />
-                    <TextBlock Text="{x:Bind ViewModel.NozzleSub, Mode=OneWay}" FontSize="8" Foreground="#6B7280" />
+                    <TextBlock Text="{x:Bind ViewModel.NozzleSub, Mode=OneWay}" FontSize="8" Foreground="{ThemeResource PwTextDim}" />
                 </StackPanel>
             </Border>
-            <Border Grid.Column="1" CornerRadius="8" Background="#09FFFFFF" Padding="9,8">
+            <Border Grid.Column="1" CornerRadius="8" Background="{ThemeResource PwSubCardFill}" Padding="9,8">
                 <StackPanel>
-                    <TextBlock Text="Bed" FontSize="9" Foreground="#8A919C" />
+                    <TextBlock Text="Bed" FontSize="9" Foreground="{ThemeResource PwTextMuted}" />
                     <TextBlock Text="{x:Bind ViewModel.BedText, Mode=OneWay}" FontSize="14" FontWeight="SemiBold" />
-                    <TextBlock Text="{x:Bind ViewModel.BedSub, Mode=OneWay}" FontSize="8" Foreground="#6B7280" />
+                    <TextBlock Text="{x:Bind ViewModel.BedSub, Mode=OneWay}" FontSize="8" Foreground="{ThemeResource PwTextDim}" />
                 </StackPanel>
             </Border>
-            <Border Grid.Column="2" CornerRadius="8" Background="#09FFFFFF" Padding="9,8"
+            <Border Grid.Column="2" CornerRadius="8" Background="{ThemeResource PwSubCardFill}" Padding="9,8"
                     Visibility="{x:Bind controls:Converters.BoolToVis(ViewModel.HasChamber), Mode=OneWay}">
                 <StackPanel>
-                    <TextBlock Text="Chamber" FontSize="9" Foreground="#8A919C" />
+                    <TextBlock Text="Chamber" FontSize="9" Foreground="{ThemeResource PwTextMuted}" />
                     <TextBlock Text="{x:Bind ViewModel.ChamberText, Mode=OneWay}" FontSize="14" FontWeight="SemiBold" />
-                    <TextBlock Text="read only" FontSize="8" Foreground="#6B7280" />
+                    <TextBlock Text="read only" FontSize="8" Foreground="{ThemeResource PwTextDim}" />
                 </StackPanel>
             </Border>
             <Border Grid.Column="{x:Bind ViewModel.PopupFansColumn, Mode=OneWay}"
                     Grid.ColumnSpan="{x:Bind ViewModel.PopupFansColumnSpan, Mode=OneWay}"
-                    CornerRadius="8" Background="#09FFFFFF" Padding="9,8">
+                    CornerRadius="8" Background="{ThemeResource PwSubCardFill}" Padding="9,8">
                 <StackPanel>
-                    <TextBlock Text="Fans" FontSize="9" Foreground="#8A919C" />
+                    <TextBlock Text="Fans" FontSize="9" Foreground="{ThemeResource PwTextMuted}" />
                     <TextBlock Text="{x:Bind ViewModel.FansText, Mode=OneWay}" FontSize="14" FontWeight="SemiBold" />
-                    <TextBlock Text="{x:Bind ViewModel.FansSub, Mode=OneWay}" FontSize="8" Foreground="#6B7280" />
+                    <TextBlock Text="{x:Bind ViewModel.FansSub, Mode=OneWay}" FontSize="8" Foreground="{ThemeResource PwTextDim}" />
                 </StackPanel>
             </Border>
         </Grid>
@@ -151,9 +151,9 @@
         <!-- AMS -->
         <Grid Grid.Row="5" Visibility="{x:Bind controls:Converters.BoolToVis(ViewModel.HasAms), Mode=OneWay}">
             <TextBlock Text="{x:Bind ViewModel.AmsTitle, Mode=OneWay}" FontSize="9" FontWeight="SemiBold"
-                       Foreground="#6B7280" />
+                       Foreground="{ThemeResource PwTextDim}" />
             <TextBlock Text="{x:Bind ViewModel.AmsEnvText, Mode=OneWay}" FontSize="10"
-                       Foreground="#8A919C" HorizontalAlignment="Right" />
+                       Foreground="{ThemeResource PwTextMuted}" HorizontalAlignment="Right" />
         </Grid>
         <StackPanel Grid.Row="6" Orientation="Horizontal"
                     Visibility="{x:Bind controls:Converters.BoolToVis(ViewModel.HasAms), Mode=OneWay}">
@@ -165,10 +165,10 @@
                                           IsIndeterminate="False"
                                           Value="{x:Bind RemainingPct}"
                                           Foreground="{x:Bind ColorBrush}"
-                                          Background="#26FFFFFF" />
+                                          Background="{ThemeResource PwRingTrack}" />
                             <Ellipse Width="12" Height="12" Fill="{x:Bind ColorBrush}"
                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            <Ellipse Width="38" Height="38" Stroke="#FFFFFF" StrokeThickness="2"
+                            <Ellipse Width="38" Height="38" Stroke="{ThemeResource PwActiveRing}" StrokeThickness="2"
                                      HorizontalAlignment="Center" VerticalAlignment="Center"
                                      Visibility="{x:Bind controls:Converters.BoolToVis(IsActive), Mode=OneWay}" />
                             <TextBlock Text="!" FontWeight="Bold" FontSize="11" Foreground="#E69F00"
@@ -180,8 +180,8 @@
             </ItemsControl>
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="{x:Bind ViewModel.ActiveSpoolLine, Mode=OneWay}" FontSize="11"
-                           Foreground="#C9CDD4" />
-                <TextBlock Text="active spool" FontSize="9" Foreground="#6B7280" />
+                           Foreground="{ThemeResource PwTextSecondary}" />
+                <TextBlock Text="active spool" FontSize="9" Foreground="{ThemeResource PwTextDim}" />
             </StackPanel>
         </StackPanel>
     </Grid>

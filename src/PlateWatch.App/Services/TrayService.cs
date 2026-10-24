@@ -86,7 +86,11 @@ public sealed class TrayService : IDisposable
     private MenuFlyout BuildMenu()
     {
         var menu = new MenuFlyout();
-        menu.Opening += (_, _) => RebuildFleetItems(menu);
+        menu.Opening += (_, _) =>
+        {
+            menu.RequestedTheme = ThemeService.Current;
+            RebuildFleetItems(menu);
+        };
         menu.Items.Add(new MenuFlyoutItem { Text = "Open PlateWatch", Command = new RelayCommand(ShowWindow) });
         menu.Items.Add(new MenuFlyoutItem { Text = "Settings…", Command = new RelayCommand(ShowSettings) });
         menu.Items.Add(new MenuFlyoutSeparator());

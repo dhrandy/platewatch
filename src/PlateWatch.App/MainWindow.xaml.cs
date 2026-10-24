@@ -37,6 +37,9 @@ public sealed partial class MainWindow : Window
             presenter.PreferredMinimumHeight = 620;
         }
 
+        ApplyTheme();
+        ThemeService.Changed += (_, _) => ApplyTheme();
+
         _saveDebounce.Tick += (_, _) => { _saveDebounce.Stop(); _settings.Save(); };
         appWindow.Changed += (_, args) =>
         {
@@ -55,6 +58,12 @@ public sealed partial class MainWindow : Window
     }
 
     public FleetViewModel Fleet { get; }
+
+    private void ApplyTheme()
+    {
+        ThemeService.ApplyTo(this);
+        SpeedMenu.RequestedTheme = ThemeService.Current;
+    }
 
     private void OnSettingsClick(object sender, RoutedEventArgs e) => _openSettings?.Invoke();
 }

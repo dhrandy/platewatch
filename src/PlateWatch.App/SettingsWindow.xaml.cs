@@ -23,6 +23,9 @@ public sealed partial class SettingsWindow : Window
             appWindow.SetIcon(IconFile.CurrentPath);
         appWindow.Resize(new Windows.Graphics.SizeInt32(600, 720));
 
+        ThemeService.ApplyTo(this);
+        ThemeService.Changed += (_, _) => ThemeService.ApplyTo(this);
+        SelectThemeItem(_store.Settings.Theme);
         ToastsToggle.IsOn = _store.Settings.ToastsEnabled;
         PrintStartToggle.IsOn = _store.Settings.ToastOnPrintStart;
         PrintStartToggle.IsEnabled = _store.Settings.ToastsEnabled;
@@ -31,6 +34,23 @@ public sealed partial class SettingsWindow : Window
     }
 
     private void RefreshPrinterList() => PrinterList.ItemsSource = _store.Settings.Printers;
+
+    private void SelectThemeItem(string theme)
+    {
+        foreach (var item in ThemeCombo.Items.OfType<ComboBoxItem>())
+            if ((string)item.Tag == theme) { ThemeCombo.SelectedItem = item; return; }
+        ThemeCombo.SelectedIndex = 0;
+    }
+
+    private void OnThemeChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ThemeCombo.SelectedItem is not ComboBoxItem item) return;
+        var theme = (string)item.Tag;
+        if (theme == _store.Settings.Theme) return;
+        _store.Settings.Theme = theme;
+        _store.Save();
+        ThemeService.Apply(theme);
+    }
 
     private void OnToastsToggled(object sender, RoutedEventArgs e)
     {

@@ -74,30 +74,32 @@ jobs:
           $log = Join-Path $logDir "startup.log"
           $content = Get-Content $log -Raw -ErrorAction SilentlyContinue
           Write-Host "::warning::startup.log => $($content -replace '\r?\n', ' | ' -replace '%', '%25')"
-          # visual QA: capture the desktop while the app window is up
-          try {
-            Add-Type -AssemblyName System.Windows.Forms,System.Drawing
+          # visual QA: capture dark full-size, dark narrow, light full-size
+          Add-Type -AssemblyName System.Windows.Forms,System.Drawing
+          Add-Type @"
+            using System;
+            using System.Runtime.InteropServices;
+            public static class Win32 {
+              [DllImport("user32.dll")] public static extern bool SetWindowPos(
+                IntPtr hWnd, IntPtr after, int x, int y, int cx, int cy, uint flags);
+            }
+"@
+          function Capture($file) {
             $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
             $full = New-Object System.Drawing.Bitmap $b.Width, $b.Height
             $gr = [System.Drawing.Graphics]::FromImage($full)
             $gr.CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $full.Size)
-            $full.Save("smoke-screenshot.png")
-            $h = [int]($b.Height * (640.0 / $b.Width))
-            $thumb = $full.GetThumbnailImage(640, $h, $null, [IntPtr]::Zero)
-            $ms = New-Object System.IO.MemoryStream
-            $jpeg = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Object { $_.MimeType -eq 'image/jpeg' }
-            $ep = New-Object System.Drawing.Imaging.EncoderParameters(1)
-            $ep.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter([System.Drawing.Imaging.Encoder]::Quality, [long]60)
-            $thumb.Save($ms, $jpeg, $ep)
-            # annotation caps: ~4KB per message, 10 per level per step - chunk and
-            # spill past chunk 09 into the warning budget (smoke uses ~3)
-            $b64 = [Convert]::ToBase64String($ms.ToArray())
-            for ($i = 0; $i -lt $b64.Length; $i += 3800) {
-              $n = [Math]::Min(3800, $b64.Length - $i)
-              $lvl = if ($i -lt 38000) { 'notice' } else { 'warning' }
-              Write-Host ("::{0}::shot-part-{1:d2} => {2}" -f $lvl, [int]($i/3800), $b64.Substring($i, $n))
-            }
-          } catch { Write-Host "::warning::screenshot failed: $_" }
+            $full.Save($file)
+            $gr.Dispose()
+          }
+          try { Capture "smoke-shot-dark.png" } catch { Write-Host "::warning::screenshot dark failed: $_" }
+          # responsive layout check: narrow the main window and re-capture
+          try {
+            [Win32]::SetWindowPos($p.MainWindowHandle, [IntPtr]::Zero, 0, 0, 860, 620, 0) | Out-Null
+            Start-Sleep -Seconds 2
+            Capture "smoke-shot-narrow.png"
+            [Win32]::SetWindowPos($p.MainWindowHandle, [IntPtr]::Zero, 0, 0, 1000, 700, 0) | Out-Null
+          } catch { Write-Host "::warning::narrow screenshot failed: $_" }
           if ($p.HasExited) {
             Write-Host "::error::app exited during smoke test (code $($p.ExitCode))"
             $since = (Get-Date).AddMinutes(-3)
@@ -110,14 +112,56 @@ jobs:
             exit 1
           }
           Stop-Process -Id $p.Id -Force
+          # light theme: persist the choice, relaunch, capture
+          try {
+            $settingsPath = Join-Path $logDir "settings.json"
+            Set-Content $settingsPath '{"Theme":"Light"}'
+            $p2 = Start-Process $exe -PassThru
+            Start-Sleep -Seconds 10
+            Capture "smoke-shot-light.png"
+            if ($p2.HasExited) { Write-Host "::warning::light-theme relaunch exited early (code $($p2.ExitCode))" }
+            else { Stop-Process -Id $p2.Id -Force }
+          } catch { Write-Host "::warning::light screenshot failed: $_" }
           if ($content -notmatch 'window shown') { Write-Host "::error::window was not shown"; exit 1 }
           if ($content -match 'ERROR|FATAL') { Write-Host "::error::startup log contains ERROR/FATAL"; exit 1 }
+      - name: Emit visual QA screenshots
+        if: always()
+        shell: pwsh
+        run: |
+          # annotation caps: ~4KB per message, 10 per level per step; this step
+          # emits only screenshots (first 10 chunks notice, rest warning)
+          Add-Type -AssemblyName System.Drawing
+          foreach ($file in @("smoke-shot-dark.png", "smoke-shot-narrow.png", "smoke-shot-light.png")) {
+            if (-not (Test-Path $file)) { continue }
+            try {
+              $img = [System.Drawing.Image]::FromFile((Resolve-Path $file))
+              $h = [int]($img.Height * (600.0 / $img.Width))
+              $thumb = $img.GetThumbnailImage(600, $h, $null, [IntPtr]::Zero)
+              $img.Dispose()
+              $ms = New-Object System.IO.MemoryStream
+              $jpeg = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Object { $_.MimeType -eq 'image/jpeg' }
+              $ep = New-Object System.Drawing.Imaging.EncoderParameters(1)
+              $ep.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter([System.Drawing.Imaging.Encoder]::Quality, [long]55)
+              $thumb.Save($ms, $jpeg, $ep)
+              $name = [IO.Path]::GetFileNameWithoutExtension($file) -replace 'smoke-shot-',''
+              $b64 = [Convert]::ToBase64String($ms.ToArray())
+              for ($i = 0; $i -lt $b64.Length; $i += 3800) {
+                $n = [Math]::Min(3800, $b64.Length - $i)
+                $lvl = if ($i -lt 38000) { 'notice' } else { 'warning' }
+                Write-Host ("::{0}::shot-{1}-part-{2:d2} => {3}" -f $lvl, $name, [int]($i/3800), $b64.Substring($i, $n))
+              }
+            } catch { Write-Host "::warning::emit $file failed: $_" }
+          }
+
       - name: Upload smoke screenshot
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: smoke-screenshot
-          path: smoke-screenshot.png
+          name: smoke-screenshots
+          path: |
+            smoke-shot-dark.png
+            smoke-shot-narrow.png
+            smoke-shot-light.png
           if-no-files-found: ignore
       - name: Upload app artifact
         uses: actions/upload-artifact@v4

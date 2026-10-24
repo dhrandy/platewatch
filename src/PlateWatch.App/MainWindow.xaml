@@ -39,7 +39,7 @@
                                         <Ellipse Width="8" Height="8" HorizontalAlignment="Right"
                                                  VerticalAlignment="Bottom" Margin="0,0,-3,-3"
                                                  Fill="{x:Bind StatusBrush, Mode=OneWay}"
-                                                 Stroke="#1B1B1B" StrokeThickness="2" />
+                                                 Stroke="{ThemeResource PwStatusDotStroke}" StrokeThickness="2" />
                                     </Grid>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="12"
@@ -57,12 +57,12 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                         VerticalAlignment="Center">
                 <TextBlock Text="{x:Bind Fleet.UpdatedText, Mode=OneWay}" FontSize="11"
-                           Foreground="#8A919C" VerticalAlignment="Center" Margin="0,0,8,0" />
-                <FontIcon Glyph="&#xE72C;" FontSize="12" Foreground="#8A919C" />
+                           Foreground="{ThemeResource PwTextMuted}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <FontIcon Glyph="&#xE72C;" FontSize="12" Foreground="{ThemeResource PwTextMuted}" />
                 <Button VerticalAlignment="Center" Padding="8,6" Margin="6,0,0,0"
                         Background="Transparent" BorderThickness="0"
                         Click="OnSettingsClick" ToolTipService.ToolTip="Settings">
-                    <FontIcon Glyph="&#xE713;" FontSize="14" Foreground="#8A919C" />
+                    <FontIcon Glyph="&#xE713;" FontSize="14" Foreground="{ThemeResource PwTextMuted}" />
                 </Button>
             </StackPanel>
         </Grid>
@@ -77,8 +77,8 @@
             </Grid.ColumnDefinitions>
 
             <!-- hero card -->
-            <Border Grid.Column="0" CornerRadius="12" Background="#0BFFFFFF"
-                    BorderBrush="#12FFFFFF" BorderThickness="1" Padding="26">
+            <Border Grid.Column="0" CornerRadius="12" Background="{ThemeResource PwCardFill}"
+                    BorderBrush="{ThemeResource PwCardBorder}" BorderThickness="1" Padding="26">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="236" />
@@ -113,7 +113,7 @@
                                FontSize="22" FontWeight="SemiBold" Margin="0,20,0,0"
                                TextTrimming="CharacterEllipsis" />
                     <TextBlock Grid.Row="2" Text="{x:Bind Fleet.Selected.MaterialLine, Mode=OneWay}"
-                               FontSize="12" Foreground="#8A919C" Margin="0,6,0,0"
+                               FontSize="12" Foreground="{ThemeResource PwTextMuted}" Margin="0,6,0,0"
                                TextTrimming="CharacterEllipsis" />
 
                     <Grid Grid.Row="3" Margin="0,8,0,0">
@@ -121,14 +121,14 @@
                             <TextBlock Text="{x:Bind Fleet.Selected.PercentText, Mode=OneWay}"
                                        FontSize="52" FontWeight="SemiBold" />
                             <TextBlock Text="%" FontSize="24" FontWeight="SemiBold"
-                                       Foreground="#A7ABB3" Margin="6,0,0,0" />
+                                       Foreground="{ThemeResource PwTextSecondary}" Margin="6,0,0,0" />
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center">
                             <TextBlock Text="{x:Bind Fleet.Selected.FinishText, Mode=OneWay}"
-                                       FontSize="12" Foreground="#C9CDD4"
+                                       FontSize="12" Foreground="{ThemeResource PwTextSecondary}"
                                        HorizontalAlignment="Right" />
                             <TextBlock Text="{x:Bind Fleet.Selected.TimeLeftText, Mode=OneWay}"
-                                       FontSize="12" Foreground="#8A919C" Margin="0,4,0,0"
+                                       FontSize="12" Foreground="{ThemeResource PwTextMuted}" Margin="0,4,0,0"
                                        HorizontalAlignment="Right" />
                         </StackPanel>
                     </Grid>
@@ -159,10 +159,10 @@
                         <DropDownButton Grid.Column="2" HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch" CornerRadius="8"
                                         Content="Speed · Light" FontSize="11"
-                                        Background="#12FFFFFF" BorderBrush="#22FFFFFF"
+                                        Background="{ThemeResource PwControlFill}" BorderBrush="{ThemeResource PwControlBorder}"
                                         BorderThickness="1">
                             <DropDownButton.Flyout>
-                                <MenuFlyout>
+                                <MenuFlyout x:Name="SpeedMenu">
                                     <MenuFlyoutItem Text="Toggle light"
                                                     Command="{x:Bind Fleet.Selected.ToggleLightCommand}" />
                                     <MenuFlyoutSeparator />
@@ -183,8 +183,8 @@
                 </Grid.RowDefinitions>
 
                 <!-- temps & airflow -->
-                <Border Grid.Row="0" CornerRadius="12" Background="#0BFFFFFF"
-                        BorderBrush="#12FFFFFF" BorderThickness="1" Padding="20,18">
+                <Border Grid.Row="0" CornerRadius="12" Background="{ThemeResource PwCardFill}"
+                        BorderBrush="{ThemeResource PwCardBorder}" BorderThickness="1" Padding="20,18">
                     <Grid RowSpacing="10">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -192,13 +192,13 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Text="TEMPERATURES &amp; AIRFLOW" FontSize="9"
-                                   FontWeight="SemiBold" Foreground="#6B7280" />
+                                   FontWeight="SemiBold" Foreground="{ThemeResource PwTextDim}" />
                         <Grid Grid.Row="1" ColumnSpacing="10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Border Grid.Column="0" CornerRadius="8" Background="#08FFFFFF" Padding="14,10">
+                            <Border Grid.Column="0" CornerRadius="8" Background="{ThemeResource PwSubCardFill}" Padding="14,10">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
@@ -207,19 +207,19 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="3" />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="Nozzle" FontSize="10" Foreground="#8A919C" />
+                                    <TextBlock Text="Nozzle" FontSize="10" Foreground="{ThemeResource PwTextMuted}" />
                                     <TextBlock Grid.Row="1" Text="{x:Bind Fleet.Selected.NozzleText, Mode=OneWay}"
                                                FontSize="19" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="2" Text="{x:Bind Fleet.Selected.NozzleSub, Mode=OneWay}"
-                                               FontSize="9" Foreground="#6B7280" />
+                                               FontSize="9" Foreground="{ThemeResource PwTextDim}" />
                                     <ProgressBar Grid.Row="4" Minimum="0" Maximum="1" Height="5"
-                                                 Background="#1AFFFFFF"
+                                                 Background="{ThemeResource PwBarTrack}"
                                                  VerticalAlignment="Bottom" Margin="0,0,0,2"
                                                  Value="{x:Bind Fleet.Selected.NozzleFrac01, Mode=OneWay}"
                                                  Foreground="#4CC2FF" />
                                 </Grid>
                             </Border>
-                            <Border Grid.Column="1" CornerRadius="8" Background="#08FFFFFF" Padding="14,10">
+                            <Border Grid.Column="1" CornerRadius="8" Background="{ThemeResource PwSubCardFill}" Padding="14,10">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
@@ -228,13 +228,13 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="3" />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="Bed" FontSize="10" Foreground="#8A919C" />
+                                    <TextBlock Text="Bed" FontSize="10" Foreground="{ThemeResource PwTextMuted}" />
                                     <TextBlock Grid.Row="1" Text="{x:Bind Fleet.Selected.BedText, Mode=OneWay}"
                                                FontSize="19" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="2" Text="{x:Bind Fleet.Selected.BedSub, Mode=OneWay}"
-                                               FontSize="9" Foreground="#6B7280" />
+                                               FontSize="9" Foreground="{ThemeResource PwTextDim}" />
                                     <ProgressBar Grid.Row="4" Minimum="0" Maximum="1" Height="5"
-                                                 Background="#1AFFFFFF"
+                                                 Background="{ThemeResource PwBarTrack}"
                                                  VerticalAlignment="Bottom" Margin="0,0,0,2"
                                                  Value="{x:Bind Fleet.Selected.BedFrac01, Mode=OneWay}"
                                                  Foreground="#4CC2FF" />
@@ -246,7 +246,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Border Grid.Column="0" CornerRadius="8" Background="#08FFFFFF" Padding="14,10"
+                            <Border Grid.Column="0" CornerRadius="8" Background="{ThemeResource PwSubCardFill}" Padding="14,10"
                                     Visibility="{x:Bind controls:Converters.BoolToVis(Fleet.Selected.HasChamber), Mode=OneWay}">
                                 <Grid>
                                     <Grid.RowDefinitions>
@@ -255,14 +255,14 @@
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="Chamber" FontSize="10" Foreground="#8A919C" />
+                                    <TextBlock Text="Chamber" FontSize="10" Foreground="{ThemeResource PwTextMuted}" />
                                     <TextBlock Grid.Row="1" Text="{x:Bind Fleet.Selected.ChamberText, Mode=OneWay}"
                                                FontSize="19" FontWeight="SemiBold" />
-                                    <TextBlock Grid.Row="2" Text="read only" FontSize="9" Foreground="#6B7280" />
+                                    <TextBlock Grid.Row="2" Text="read only" FontSize="9" Foreground="{ThemeResource PwTextDim}" />
                                 </Grid>
                             </Border>
                             <Border Grid.Column="1" Grid.ColumnSpan="{x:Bind Fleet.Selected.FansColumnSpan, Mode=OneWay}"
-                                    CornerRadius="8" Background="#08FFFFFF" Padding="14,10">
+                                    CornerRadius="8" Background="{ThemeResource PwSubCardFill}" Padding="14,10">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
@@ -271,13 +271,13 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="3" />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="Fans" FontSize="10" Foreground="#8A919C" />
+                                    <TextBlock Text="Fans" FontSize="10" Foreground="{ThemeResource PwTextMuted}" />
                                     <TextBlock Grid.Row="1" Text="{x:Bind Fleet.Selected.FansText, Mode=OneWay}"
                                                FontSize="19" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="2" Text="{x:Bind Fleet.Selected.FansSub, Mode=OneWay}"
-                                               FontSize="9" Foreground="#6B7280" />
+                                               FontSize="9" Foreground="{ThemeResource PwTextDim}" />
                                     <ProgressBar Grid.Row="4" Minimum="0" Maximum="1" Height="5"
-                                                 Background="#1AFFFFFF"
+                                                 Background="{ThemeResource PwBarTrack}"
                                                  VerticalAlignment="Bottom" Margin="0,0,0,2"
                                                  Value="{x:Bind Fleet.Selected.FanFrac01, Mode=OneWay}"
                                                  Foreground="#4CC2FF" />
@@ -288,8 +288,8 @@
                 </Border>
 
                 <!-- filament card (hidden when the printer has no AMS) -->
-                <Border Grid.Row="1" CornerRadius="12" Background="#0BFFFFFF"
-                        BorderBrush="#12FFFFFF" BorderThickness="1" Padding="20,18"
+                <Border Grid.Row="1" CornerRadius="12" Background="{ThemeResource PwCardFill}"
+                        BorderBrush="{ThemeResource PwCardBorder}" BorderThickness="1" Padding="20,18"
                         Visibility="{x:Bind controls:Converters.BoolToVis(Fleet.Selected.HasAms), Mode=OneWay}">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -299,9 +299,9 @@
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <TextBlock Text="{x:Bind Fleet.Selected.FilamentHeader, Mode=OneWay}"
-                                       FontSize="9" FontWeight="SemiBold" Foreground="#6B7280" />
+                                       FontSize="9" FontWeight="SemiBold" Foreground="{ThemeResource PwTextDim}" />
                             <TextBlock Text="{x:Bind Fleet.Selected.AmsEnvText, Mode=OneWay}"
-                                       FontSize="10" Foreground="#8A919C"
+                                       FontSize="10" Foreground="{ThemeResource PwTextMuted}"
                                        HorizontalAlignment="Right" />
                         </Grid>
                         <ItemsControl Grid.Row="1" ItemsSource="{x:Bind Fleet.Selected.Spools, Mode=OneWay}"
@@ -315,7 +315,7 @@
                                 <DataTemplate x:DataType="vm:SpoolViewModel">
                                     <StackPanel Margin="10,0" HorizontalAlignment="Center">
                                         <Grid Width="64" Height="64" HorizontalAlignment="Center">
-                                            <Ellipse Width="56" Height="56" Stroke="#26FFFFFF" StrokeThickness="5" />
+                                            <Ellipse Width="56" Height="56" Stroke="{ThemeResource PwRingTrack}" StrokeThickness="5" />
                                             <Ellipse Width="56" Height="56" Stroke="{x:Bind ColorBrush}"
                                                      StrokeThickness="5" StrokeDashArray="{x:Bind RingDash}"
                                                      RenderTransformOrigin="0.5,0.5">
@@ -324,7 +324,7 @@
                                                 </Ellipse.RenderTransform>
                                             </Ellipse>
                                             <Ellipse Width="24" Height="24" Fill="{x:Bind ColorBrush}" />
-                                            <Ellipse Width="60" Height="60" Stroke="#FFFFFF" StrokeThickness="2"
+                                            <Ellipse Width="60" Height="60" Stroke="{ThemeResource PwActiveRing}" StrokeThickness="2"
                                                      Visibility="{x:Bind controls:Converters.BoolToVis(IsActive), Mode=OneWay}" />
                                             <Border Width="15" Height="15" CornerRadius="8" Background="#E69F00"
                                                     HorizontalAlignment="Right" VerticalAlignment="Top"
@@ -336,14 +336,14 @@
                                             </Border>
                                         </Grid>
                                         <TextBlock Text="{x:Bind RemainingText}" FontSize="10"
-                                                   FontWeight="SemiBold" Foreground="#C9CDD4"
+                                                   FontWeight="SemiBold" Foreground="{ThemeResource PwTextSecondary}"
                                                    HorizontalAlignment="Center" Margin="0,6,0,0" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                         <TextBlock Grid.Row="2" Text="{x:Bind Fleet.Selected.ActiveSpoolCaption, Mode=OneWay}"
-                                   FontSize="11" Foreground="#8A919C" Margin="0,0,0,10" />
+                                   FontSize="11" Foreground="{ThemeResource PwTextMuted}" Margin="0,0,0,10" />
                     </Grid>
                 </Border>
             </Grid>

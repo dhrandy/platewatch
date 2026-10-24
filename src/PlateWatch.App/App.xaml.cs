@@ -45,6 +45,7 @@ public partial class App : Application
         var settings = SettingsStore.Load();
         _settings = settings;
         StartupLog.Step("settings loaded");
+        ThemeService.Apply(settings.Settings.Theme);
         // generate the .ico (windows + taskbar) before any window is created;
         // icon failure must never take down startup
         try

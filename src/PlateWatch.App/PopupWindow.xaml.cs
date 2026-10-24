@@ -17,6 +17,8 @@ public sealed partial class PopupWindow : Window
         InitializeComponent();
         Title = "PlateWatch";
         SystemBackdrop = new MicaBackdrop();
+        ThemeService.ApplyTo(this);
+        ThemeService.Changed += (_, _) => ThemeService.ApplyTo(this);
 
         var appWindow = AppWindow;
         if (IconFile.CurrentPath is not null)

@@ -2,13 +2,46 @@
 <Application
     x:Class="PlateWatch.App.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    RequestedTheme="Dark">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.ThemeDictionaries>
+                <!-- dark: the approved render values -->
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="PwCardFill" Color="#0BFFFFFF" />
+                    <SolidColorBrush x:Key="PwCardBorder" Color="#12FFFFFF" />
+                    <SolidColorBrush x:Key="PwSubCardFill" Color="#08FFFFFF" />
+                    <SolidColorBrush x:Key="PwControlFill" Color="#14FFFFFF" />
+                    <SolidColorBrush x:Key="PwControlBorder" Color="#22FFFFFF" />
+                    <SolidColorBrush x:Key="PwTextPrimary" Color="#F3F4F6" />
+                    <SolidColorBrush x:Key="PwTextSecondary" Color="#C9CDD4" />
+                    <SolidColorBrush x:Key="PwTextMuted" Color="#8A919C" />
+                    <SolidColorBrush x:Key="PwTextDim" Color="#6B7280" />
+                    <SolidColorBrush x:Key="PwRingTrack" Color="#26FFFFFF" />
+                    <SolidColorBrush x:Key="PwBarTrack" Color="#1AFFFFFF" />
+                    <SolidColorBrush x:Key="PwActiveRing" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="PwStatusDotStroke" Color="#1B1B1B" />
+                </ResourceDictionary>
+                <!-- light: same structure, solid surfaces on light mica -->
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="PwCardFill" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="PwCardBorder" Color="#1F000000" />
+                    <SolidColorBrush x:Key="PwSubCardFill" Color="#F3F4F6" />
+                    <SolidColorBrush x:Key="PwControlFill" Color="#0F000000" />
+                    <SolidColorBrush x:Key="PwControlBorder" Color="#29000000" />
+                    <SolidColorBrush x:Key="PwTextPrimary" Color="#1B1B1B" />
+                    <SolidColorBrush x:Key="PwTextSecondary" Color="#3C4043" />
+                    <SolidColorBrush x:Key="PwTextMuted" Color="#5F6368" />
+                    <SolidColorBrush x:Key="PwTextDim" Color="#80868B" />
+                    <SolidColorBrush x:Key="PwRingTrack" Color="#1F000000" />
+                    <SolidColorBrush x:Key="PwBarTrack" Color="#14000000" />
+                    <SolidColorBrush x:Key="PwActiveRing" Color="#1B1B1B" />
+                    <SolidColorBrush x:Key="PwStatusDotStroke" Color="#FFFFFF" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

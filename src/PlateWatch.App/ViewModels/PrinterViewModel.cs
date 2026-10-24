@@ -5,6 +5,7 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 using PlateWatch.Core;
+using PlateWatch.App.Services;
 
 namespace PlateWatch.App.ViewModels;
 
@@ -24,7 +25,20 @@ public partial class PrinterViewModel : ObservableObject
             if (_ui.HasThreadAccess) Refresh();
             else _ui.TryEnqueue(() => Refresh());
         };
+        ThemeService.Changed += (_, _) =>
+        {
+            if (_ui.HasThreadAccess) RefreshThemeBrushes();
+            else _ui.TryEnqueue(() => RefreshThemeBrushes());
+        };
         Refresh();
+    }
+
+    private void RefreshThemeBrushes()
+    {
+        OnPropertyChanged(nameof(ChipBackgroundBrush));
+        OnPropertyChanged(nameof(ChipBorderBrush));
+        OnPropertyChanged(nameof(ChipNameBrush));
+        OnPropertyChanged(nameof(ChipSubBrush));
     }
 
     public IBambuClient Client => _client;
@@ -89,17 +103,27 @@ public partial class PrinterViewModel : ObservableObject
     [RelayCommand]
     private void Select() => RequestSelect?.Invoke();
 
-    private static readonly Brush ChipSelBg = new SolidColorBrush(Color.FromArgb(0x10, 0xFF, 0xFF, 0xFF));
-    private static readonly Brush ChipSelBorder = new SolidColorBrush(Color.FromArgb(0x2E, 0xFF, 0xFF, 0xFF));
+    private static readonly Brush ChipSelBgD = new SolidColorBrush(Color.FromArgb(0x10, 0xFF, 0xFF, 0xFF));
+    private static readonly Brush ChipSelBgL = new SolidColorBrush(Color.FromArgb(0x0F, 0x00, 0x00, 0x00));
+    private static readonly Brush ChipSelBorderD = new SolidColorBrush(Color.FromArgb(0x2E, 0xFF, 0xFF, 0xFF));
+    private static readonly Brush ChipSelBorderL = new SolidColorBrush(Color.FromArgb(0x33, 0x00, 0x00, 0x00));
     private static readonly Brush Clear = new SolidColorBrush(Colors.Transparent);
-    private static readonly Brush ChipNameSel = new SolidColorBrush(SpoolViewModel.Parse("#F3F4F6"));
-    private static readonly Brush ChipNameIdle = new SolidColorBrush(SpoolViewModel.Parse("#C9CDD4"));
-    private static readonly Brush ChipSubIdle = new SolidColorBrush(SpoolViewModel.Parse("#8A919C"));
+    private static readonly Brush ChipNameSelD = new SolidColorBrush(SpoolViewModel.Parse("#F3F4F6"));
+    private static readonly Brush ChipNameSelL = new SolidColorBrush(SpoolViewModel.Parse("#1B1B1B"));
+    private static readonly Brush ChipNameIdleD = new SolidColorBrush(SpoolViewModel.Parse("#C9CDD4"));
+    private static readonly Brush ChipNameIdleL = new SolidColorBrush(SpoolViewModel.Parse("#3C4043"));
+    private static readonly Brush ChipSubIdleD = new SolidColorBrush(SpoolViewModel.Parse("#8A919C"));
+    private static readonly Brush ChipSubIdleL = new SolidColorBrush(SpoolViewModel.Parse("#5F6368"));
 
-    public Brush ChipBackgroundBrush => IsSelected ? ChipSelBg : Clear;
-    public Brush ChipBorderBrush => IsSelected ? ChipSelBorder : Clear;
-    public Brush ChipNameBrush => IsSelected ? ChipNameSel : ChipNameIdle;
-    public Brush ChipSubBrush => IsSelected ? StatusBrush : ChipSubIdle;
+    public Brush ChipBackgroundBrush => IsSelected
+        ? (ThemeService.IsLight ? ChipSelBgL : ChipSelBgD) : Clear;
+    public Brush ChipBorderBrush => IsSelected
+        ? (ThemeService.IsLight ? ChipSelBorderL : ChipSelBorderD) : Clear;
+    public Brush ChipNameBrush => IsSelected
+        ? (ThemeService.IsLight ? ChipNameSelL : ChipNameSelD)
+        : (ThemeService.IsLight ? ChipNameIdleL : ChipNameIdleD);
+    public Brush ChipSubBrush => IsSelected ? StatusBrush
+        : (ThemeService.IsLight ? ChipSubIdleL : ChipSubIdleD);
 
     public string ChipLine => _client.State.Status is PrinterStatus.Printing or PrinterStatus.Paused
         ? $"{StatusLabel} · {PercentText}%"
