@@ -85,12 +85,17 @@ jobs:
             $h = [int]($b.Height * (640.0 / $b.Width))
             $thumb = $full.GetThumbnailImage(640, $h, $null, [IntPtr]::Zero)
             $ms = New-Object System.IO.MemoryStream
-            $thumb.Save($ms, [System.Drawing.Imaging.ImageFormat]::Jpeg)
-            # GitHub truncates annotation messages around 4KB - emit the jpeg in chunks
+            $jpeg = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Object { $_.MimeType -eq 'image/jpeg' }
+            $ep = New-Object System.Drawing.Imaging.EncoderParameters(1)
+            $ep.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter([System.Drawing.Imaging.Encoder]::Quality, [long]60)
+            $thumb.Save($ms, $jpeg, $ep)
+            # annotation caps: ~4KB per message, 10 per level per step - chunk and
+            # spill past chunk 09 into the warning budget (smoke uses ~3)
             $b64 = [Convert]::ToBase64String($ms.ToArray())
             for ($i = 0; $i -lt $b64.Length; $i += 3800) {
               $n = [Math]::Min(3800, $b64.Length - $i)
-              Write-Host ("::notice::shot-part-{0:d2} => {1}" -f [int]($i/3800), $b64.Substring($i, $n))
+              $lvl = if ($i -lt 38000) { 'notice' } else { 'warning' }
+              Write-Host ("::{0}::shot-part-{1:d2} => {2}" -f $lvl, [int]($i/3800), $b64.Substring($i, $n))
             }
           } catch { Write-Host "::warning::screenshot failed: $_" }
           if ($p.HasExited) {
