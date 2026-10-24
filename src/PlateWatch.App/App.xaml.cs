@@ -13,6 +13,18 @@ public partial class App : Application
 
     public App()
     {
+        UnhandledException += (_, e) =>
+            StartupLog.Step($"FATAL unhandled: {e.Exception.GetType().FullName}: {e.Exception.Message} :: {e.Exception.StackTrace}");
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            if (e.ExceptionObject is Exception ex)
+                StartupLog.Step($"FATAL appdomain: {ex.GetType().FullName}: {ex.Message} :: {ex.StackTrace}");
+        };
+        System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            var ex = e.Exception.GetBaseException();
+            StartupLog.Step($"FATAL unobserved task: {ex.GetType().FullName}: {ex.Message} :: {ex.StackTrace}");
+        };
         try
         {
             InitializeComponent();

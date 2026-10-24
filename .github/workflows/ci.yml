@@ -74,7 +74,17 @@ jobs:
           $log = Join-Path $logDir "startup.log"
           $content = Get-Content $log -Raw -ErrorAction SilentlyContinue
           Write-Host "::warning::startup.log => $($content -replace '\r?\n', ' | ' -replace '%', '%25')"
-          if ($p.HasExited) { Write-Host "::error::app exited during smoke test (code $($p.ExitCode))"; exit 1 }
+          if ($p.HasExited) {
+            Write-Host "::error::app exited during smoke test (code $($p.ExitCode))"
+            $since = (Get-Date).AddMinutes(-3)
+            Get-WinEvent -FilterHashtable @{LogName='Application'; Id=1000,1001,1026; StartTime=$since} -ErrorAction SilentlyContinue |
+              ForEach-Object {
+                $m = ($_.Message -replace '\r?\n',' | ')
+                if ($m.Length -gt 1100) { $m = $m.Substring(0,1100) }
+                Write-Host ("::warning::wer" + $_.Id + " => " + ($m -replace '%','%25'))
+              }
+            exit 1
+          }
           Stop-Process -Id $p.Id -Force
           if ($content -notmatch 'window shown') { Write-Host "::error::window was not shown"; exit 1 }
           if ($content -match 'ERROR') { Write-Host "::error::startup log contains ERROR"; exit 1 }
