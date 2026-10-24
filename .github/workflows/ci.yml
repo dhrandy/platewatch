@@ -90,7 +90,7 @@ jobs:
             $b64 = [Convert]::ToBase64String($ms.ToArray())
             for ($i = 0; $i -lt $b64.Length; $i += 3800) {
               $n = [Math]::Min(3800, $b64.Length - $i)
-              Write-Host ("::warning::shot-part-{0:d2} => {1}" -f [int]($i/3800), $b64.Substring($i, $n))
+              Write-Host ("::notice::shot-part-{0:d2} => {1}" -f [int]($i/3800), $b64.Substring($i, $n))
             }
           } catch { Write-Host "::warning::screenshot failed: $_" }
           if ($p.HasExited) {
