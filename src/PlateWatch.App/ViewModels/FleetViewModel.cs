@@ -37,5 +37,13 @@ public partial class FleetViewModel : ObservableObject
     {
         foreach (var p in _fleet.Printers)
             if (p is MockBambuClient m) m.Tick(now);
+
+        if (_fleet.Printers.Count > 0)
+        {
+            var ago = now - _fleet.Printers.Max(p => p.State.LastUpdated);
+            UpdatedText = ago.TotalSeconds < 5 ? "Updated just now"
+                : ago.TotalMinutes < 1 ? $"Updated {(int)ago.TotalSeconds}s ago"
+                : $"Updated {(int)ago.TotalMinutes}m ago";
+        }
     }
 }

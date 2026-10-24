@@ -19,6 +19,8 @@ public sealed class AppSettings
     public bool ToastsEnabled { get; set; } = true;
     public bool ToastOnPrintStart { get; set; }   // opt-in, per the approved plan
     public bool StartWithWindows { get; set; }
+    public int WindowWidth { get; set; } = 1000;
+    public int WindowHeight { get; set; } = 700;
     public List<PrinterConfig> Printers { get; set; } = new();
 }
 

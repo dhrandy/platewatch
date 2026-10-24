@@ -108,7 +108,7 @@ public partial class App : Application
         }
         else
         {
-            var window = new MainWindow(_host.Fleet);
+            var window = new MainWindow(_host.Fleet, settings);
             window.AppWindow.Show();
             window.Activate();
         }

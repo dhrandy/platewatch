@@ -41,7 +41,7 @@ public sealed class TrayService : IDisposable
     {
         if (_window is null)
         {
-            _window = new MainWindow(_fleet);
+            _window = new MainWindow(_fleet, _settings, ShowSettings);
             StartupLog.Step("window created");
             _window.AppWindow.Closing += (_, args) =>
             {

@@ -27,6 +27,11 @@ public partial class SpoolViewModel : ObservableObject
     public double RemainingPct => Remaining01 * 100;
     public string RemainingText => $"{RemainingPct:0}%";
 
+    // dash pattern for the 56px / 5px-stroke donut ellipse (r = 25.5, C = 2pir)
+    private const double RingCircumference = 160.2;
+    public Microsoft.UI.Xaml.Media.DoubleCollection RingDash =>
+        new() { Remaining01 * RingCircumference, RingCircumference };
+
     public static Color Parse(string hex)
     {
         hex = hex.TrimStart('#');

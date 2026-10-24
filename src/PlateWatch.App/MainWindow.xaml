@@ -35,6 +35,7 @@
                                     </Grid.ColumnDefinitions>
                                     <Grid Width="24" Height="24" VerticalAlignment="Center">
                                         <Border CornerRadius="5" BorderBrush="#9AA0A6" BorderThickness="2" />
+                                        <FontIcon Glyph="&#xE749;" FontSize="10" Foreground="#9AA0A6" />
                                         <Ellipse Width="8" Height="8" HorizontalAlignment="Right"
                                                  VerticalAlignment="Bottom" Margin="0,0,-3,-3"
                                                  Fill="{x:Bind StatusBrush, Mode=OneWay}"
@@ -58,11 +59,18 @@
                 <TextBlock Text="{x:Bind Fleet.UpdatedText, Mode=OneWay}" FontSize="11"
                            Foreground="#8A919C" VerticalAlignment="Center" Margin="0,0,8,0" />
                 <FontIcon Glyph="&#xE72C;" FontSize="12" Foreground="#8A919C" />
+                <Button VerticalAlignment="Center" Padding="8,6" Margin="6,0,0,0"
+                        Background="Transparent" BorderThickness="0"
+                        Click="OnSettingsClick" ToolTipService.ToolTip="Settings">
+                    <FontIcon Glyph="&#xE713;" FontSize="14" Foreground="#8A919C" />
+                </Button>
             </StackPanel>
         </Grid>
 
         <!-- cards area -->
-        <Grid Grid.Row="1" ColumnSpacing="18">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+        <Grid ColumnSpacing="18">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="52*" />
                 <ColumnDefinition Width="48*" />
@@ -204,7 +212,8 @@
                                                FontSize="19" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="2" Text="{x:Bind Fleet.Selected.NozzleSub, Mode=OneWay}"
                                                FontSize="9" Foreground="#6B7280" />
-                                    <ProgressBar Grid.Row="4" Minimum="0" Maximum="1" Height="3"
+                                    <ProgressBar Grid.Row="4" Minimum="0" Maximum="1" Height="5"
+                                                 Background="#1AFFFFFF"
                                                  VerticalAlignment="Bottom" Margin="0,0,0,2"
                                                  Value="{x:Bind Fleet.Selected.NozzleFrac01, Mode=OneWay}"
                                                  Foreground="#4CC2FF" />
@@ -224,7 +233,8 @@
                                                FontSize="19" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="2" Text="{x:Bind Fleet.Selected.BedSub, Mode=OneWay}"
                                                FontSize="9" Foreground="#6B7280" />
-                                    <ProgressBar Grid.Row="4" Minimum="0" Maximum="1" Height="3"
+                                    <ProgressBar Grid.Row="4" Minimum="0" Maximum="1" Height="5"
+                                                 Background="#1AFFFFFF"
                                                  VerticalAlignment="Bottom" Margin="0,0,0,2"
                                                  Value="{x:Bind Fleet.Selected.BedFrac01, Mode=OneWay}"
                                                  Foreground="#4CC2FF" />
@@ -264,7 +274,8 @@
                                                FontSize="19" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="2" Text="{x:Bind Fleet.Selected.FansSub, Mode=OneWay}"
                                                FontSize="9" Foreground="#6B7280" />
-                                    <ProgressBar Grid.Row="4" Minimum="0" Maximum="1" Height="3"
+                                    <ProgressBar Grid.Row="4" Minimum="0" Maximum="1" Height="5"
+                                                 Background="#1AFFFFFF"
                                                  VerticalAlignment="Bottom" Margin="0,0,0,2"
                                                  Value="{x:Bind Fleet.Selected.FanFrac01, Mode=OneWay}"
                                                  Foreground="#4CC2FF" />
@@ -299,15 +310,18 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:SpoolViewModel">
-                                    <StackPanel Margin="13,0" HorizontalAlignment="Center">
-                                        <Grid Width="76" Height="76" HorizontalAlignment="Center">
-                                            <ProgressRing Width="68" Height="68" Minimum="0" Maximum="100"
-                                                          IsIndeterminate="False"
-                                                          Value="{x:Bind RemainingPct}"
-                                                          Foreground="{x:Bind ColorBrush}"
-                                                          Background="#26FFFFFF" />
-                                            <Ellipse Width="30" Height="30" Fill="{x:Bind ColorBrush}" />
-                                            <Ellipse Width="76" Height="76" Stroke="#FFFFFF" StrokeThickness="2"
+                                    <StackPanel Margin="10,0" HorizontalAlignment="Center">
+                                        <Grid Width="64" Height="64" HorizontalAlignment="Center">
+                                            <Ellipse Width="56" Height="56" Stroke="#26FFFFFF" StrokeThickness="5" />
+                                            <Ellipse Width="56" Height="56" Stroke="{x:Bind ColorBrush}"
+                                                     StrokeThickness="5" StrokeDashArray="{x:Bind RingDash}"
+                                                     RenderTransformOrigin="0.5,0.5">
+                                                <Ellipse.RenderTransform>
+                                                    <RotateTransform Angle="-90" />
+                                                </Ellipse.RenderTransform>
+                                            </Ellipse>
+                                            <Ellipse Width="24" Height="24" Fill="{x:Bind ColorBrush}" />
+                                            <Ellipse Width="60" Height="60" Stroke="#FFFFFF" StrokeThickness="2"
                                                      Visibility="{x:Bind controls:Converters.BoolToVis(IsActive), Mode=OneWay}" />
                                             <Border Width="15" Height="15" CornerRadius="8" Background="#E69F00"
                                                     HorizontalAlignment="Right" VerticalAlignment="Top"
@@ -320,7 +334,7 @@
                                         </Grid>
                                         <TextBlock Text="{x:Bind RemainingText}" FontSize="10"
                                                    FontWeight="SemiBold" Foreground="#C9CDD4"
-                                                   HorizontalAlignment="Center" Margin="0,12,0,0" />
+                                                   HorizontalAlignment="Center" Margin="0,6,0,0" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -331,5 +345,6 @@
                 </Border>
             </Grid>
         </Grid>
+        </ScrollViewer>
     </Grid>
 </Window>
