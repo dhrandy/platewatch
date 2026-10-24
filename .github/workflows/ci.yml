@@ -82,11 +82,16 @@ jobs:
             $gr = [System.Drawing.Graphics]::FromImage($full)
             $gr.CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $full.Size)
             $full.Save("smoke-screenshot.png")
-            $h = [int]($b.Height * (480.0 / $b.Width))
-            $thumb = $full.GetThumbnailImage(480, $h, $null, [IntPtr]::Zero)
+            $h = [int]($b.Height * (640.0 / $b.Width))
+            $thumb = $full.GetThumbnailImage(640, $h, $null, [IntPtr]::Zero)
             $ms = New-Object System.IO.MemoryStream
             $thumb.Save($ms, [System.Drawing.Imaging.ImageFormat]::Jpeg)
-            Write-Host ("::warning::screenshot-b64 => " + [Convert]::ToBase64String($ms.ToArray()))
+            # GitHub truncates annotation messages around 4KB - emit the jpeg in chunks
+            $b64 = [Convert]::ToBase64String($ms.ToArray())
+            for ($i = 0; $i -lt $b64.Length; $i += 3800) {
+              $n = [Math]::Min(3800, $b64.Length - $i)
+              Write-Host ("::warning::shot-part-{0:d2} => {1}" -f [int]($i/3800), $b64.Substring($i, $n))
+            }
           } catch { Write-Host "::warning::screenshot failed: $_" }
           if ($p.HasExited) {
             Write-Host "::error::app exited during smoke test (code $($p.ExitCode))"
