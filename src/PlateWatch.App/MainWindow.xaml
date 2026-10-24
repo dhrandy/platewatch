@@ -162,7 +162,7 @@
                                         Background="{ThemeResource PwControlFill}" BorderBrush="{ThemeResource PwControlBorder}"
                                         BorderThickness="1">
                             <DropDownButton.Flyout>
-                                <MenuFlyout x:Name="SpeedMenu">
+                                <MenuFlyout>
                                     <MenuFlyoutItem Text="Toggle light"
                                                     Command="{x:Bind Fleet.Selected.ToggleLightCommand}" />
                                     <MenuFlyoutSeparator />

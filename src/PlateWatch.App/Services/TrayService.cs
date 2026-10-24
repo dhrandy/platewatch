@@ -86,11 +86,9 @@ public sealed class TrayService : IDisposable
     private MenuFlyout BuildMenu()
     {
         var menu = new MenuFlyout();
-        menu.Opening += (_, _) =>
-        {
-            menu.RequestedTheme = ThemeService.Current;
-            RebuildFleetItems(menu);
-        };
+        // Flyouts share the window's XAML tree in WinAppSDK 2.x, so the
+        // window content's RequestedTheme already cascades to this menu.
+        menu.Opening += (_, _) => RebuildFleetItems(menu);
         menu.Items.Add(new MenuFlyoutItem { Text = "Open PlateWatch", Command = new RelayCommand(ShowWindow) });
         menu.Items.Add(new MenuFlyoutItem { Text = "Settings…", Command = new RelayCommand(ShowSettings) });
         menu.Items.Add(new MenuFlyoutSeparator());

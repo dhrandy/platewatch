@@ -59,11 +59,7 @@ public sealed partial class MainWindow : Window
 
     public FleetViewModel Fleet { get; }
 
-    private void ApplyTheme()
-    {
-        ThemeService.ApplyTo(this);
-        SpeedMenu.RequestedTheme = ThemeService.Current;
-    }
+    private void ApplyTheme() => ThemeService.ApplyTo(this);
 
     private void OnSettingsClick(object sender, RoutedEventArgs e) => _openSettings?.Invoke();
 }
