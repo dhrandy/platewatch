@@ -19,14 +19,15 @@ public class DesignAndFormattingTests
     [Fact]
     public void Status_glyphs_and_colors_are_unique()
     {
-        Assert.Equal(5, DesignTokens.AllStyles.Values.Select(s => s.Glyph).Distinct().Count());
-        Assert.Equal(5, DesignTokens.AllStyles.Values.Select(s => s.ColorHex).Distinct().Count());
+        Assert.Equal(6, DesignTokens.AllStyles.Values.Select(s => s.Glyph).Distinct().Count());
+        Assert.Equal(6, DesignTokens.AllStyles.Values.Select(s => s.ColorHex).Distinct().Count());
     }
 
     [Fact]
     public void Status_palette_is_okabe_ito_colorblind_safe()
     {
-        var allowed = new[] { "#0072B2", "#E69F00", "#009E73", "#D55E00", "#9AA0A6" };
+        // Okabe-Ito set plus the two neutral grays (idle, offline) - both colorblind-safe
+        var allowed = new[] { "#0072B2", "#E69F00", "#009E73", "#D55E00", "#9AA0A6", "#6B7280" };
         foreach (var style in DesignTokens.AllStyles.Values)
             Assert.Contains(style.ColorHex, allowed);
     }
