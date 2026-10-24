@@ -216,7 +216,7 @@
                                                  Background="{ThemeResource PwBarTrack}"
                                                  VerticalAlignment="Bottom" Margin="0,0,0,2"
                                                  Value="{x:Bind Fleet.Selected.NozzleFrac01, Mode=OneWay}"
-                                                 Foreground="#4CC2FF" />
+                                                 Foreground="{ThemeResource PwBarFill}" />
                                 </Grid>
                             </Border>
                             <Border Grid.Column="1" CornerRadius="8" Background="{ThemeResource PwSubCardFill}" Padding="14,10">
@@ -237,7 +237,7 @@
                                                  Background="{ThemeResource PwBarTrack}"
                                                  VerticalAlignment="Bottom" Margin="0,0,0,2"
                                                  Value="{x:Bind Fleet.Selected.BedFrac01, Mode=OneWay}"
-                                                 Foreground="#4CC2FF" />
+                                                 Foreground="{ThemeResource PwBarFill}" />
                                 </Grid>
                             </Border>
                         </Grid>
@@ -280,7 +280,7 @@
                                                  Background="{ThemeResource PwBarTrack}"
                                                  VerticalAlignment="Bottom" Margin="0,0,0,2"
                                                  Value="{x:Bind Fleet.Selected.FanFrac01, Mode=OneWay}"
-                                                 Foreground="#4CC2FF" />
+                                                 Foreground="{ThemeResource PwBarFill}" />
                                 </Grid>
                             </Border>
                         </Grid>

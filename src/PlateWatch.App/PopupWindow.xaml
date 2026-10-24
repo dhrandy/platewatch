@@ -171,7 +171,7 @@
                             <Ellipse Width="38" Height="38" Stroke="{ThemeResource PwActiveRing}" StrokeThickness="2"
                                      HorizontalAlignment="Center" VerticalAlignment="Center"
                                      Visibility="{x:Bind controls:Converters.BoolToVis(IsActive), Mode=OneWay}" />
-                            <TextBlock Text="!" FontWeight="Bold" FontSize="11" Foreground="#E69F00"
+                            <TextBlock Text="!" FontWeight="Bold" FontSize="11" Foreground="{ThemeResource PwWarningText}"
                                        HorizontalAlignment="Right" VerticalAlignment="Top"
                                        Visibility="{x:Bind controls:Converters.BoolToVis(IsLow), Mode=OneWay}" Margin="0,-6,-6,0" />
                         </Grid>

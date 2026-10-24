@@ -35,11 +35,28 @@ public partial class PrinterViewModel : ObservableObject
 
     private void RefreshThemeBrushes()
     {
+        StatusBrush = new SolidColorBrush(SpoolViewModel.Parse(
+            StatusColorHex(DesignTokens.StyleFor(_client.State.Status))));
         OnPropertyChanged(nameof(ChipBackgroundBrush));
         OnPropertyChanged(nameof(ChipBorderBrush));
         OnPropertyChanged(nameof(ChipNameBrush));
         OnPropertyChanged(nameof(ChipSubBrush));
+        OnPropertyChanged(nameof(StopBrush));
+        OnPropertyChanged(nameof(StopForegroundBrush));
     }
+
+    // Dark theme uses the approved Okabe-Ito colors as-is; on white cards
+    // several fail 4.5:1 normal-text contrast, so light uses darkened
+    // variants of the same hues (measured: 4.6-6.2:1 on #FFFFFF).
+    private static string StatusColorHex(StatusStyle style) =>
+        !ThemeService.IsLight ? style.ColorHex : style.ColorHex switch
+        {
+            "#E69F00" => "#A66100", // paused amber
+            "#009E73" => "#007A5A", // finished green
+            "#D55E00" => "#C45000", // error vermillion
+            "#9AA0A6" => "#5F6368", // idle gray
+            _ => style.ColorHex,    // printing blue, offline gray pass as-is
+        };
 
     public IBambuClient Client => _client;
 
@@ -139,13 +156,17 @@ public partial class PrinterViewModel : ObservableObject
 
     public List<SpoolViewModel> Spools { get; private set; } = new();
 
-    private static readonly Brush NeutralBtn = new SolidColorBrush(Color.FromArgb(0x14, 0xFF, 0xFF, 0xFF));
+    private static readonly Brush NeutralBtnD = new SolidColorBrush(Color.FromArgb(0x14, 0xFF, 0xFF, 0xFF));
+    private static readonly Brush NeutralBtnL = new SolidColorBrush(Color.FromArgb(0x0F, 0x00, 0x00, 0x00));
     private static readonly Brush ArmedBtn = new SolidColorBrush(SpoolViewModel.Parse("#D55E00"));
-    private static readonly Brush StopText = new SolidColorBrush(SpoolViewModel.Parse("#E88B5C"));
+    private static readonly Brush StopTextD = new SolidColorBrush(SpoolViewModel.Parse("#E88B5C"));
+    private static readonly Brush StopTextL = new SolidColorBrush(SpoolViewModel.Parse("#C45000"));
     private static readonly Brush ArmedText = new SolidColorBrush(Colors.White);
 
-    public Brush StopBrush => StopArmed ? ArmedBtn : NeutralBtn;
-    public Brush StopForegroundBrush => StopArmed ? ArmedText : StopText;
+    public Brush StopBrush => StopArmed ? ArmedBtn
+        : (ThemeService.IsLight ? NeutralBtnL : NeutralBtnD);
+    public Brush StopForegroundBrush => StopArmed ? ArmedText
+        : (ThemeService.IsLight ? StopTextL : StopTextD);
 
     [RelayCommand]
     private async Task PauseResumeAsync()
@@ -187,7 +208,7 @@ public partial class PrinterViewModel : ObservableObject
         Name = _client.Identity.Name;
         StatusLabel = style.Label;
         StatusGlyph = style.Glyph;
-        StatusBrush = new SolidColorBrush(SpoolViewModel.Parse(style.ColorHex));
+        StatusBrush = new SolidColorBrush(SpoolViewModel.Parse(StatusColorHex(style)));
         var pillColor = SpoolViewModel.Parse(style.ColorHex);
         pillColor.A = 0x3C;
         StatusPillBrush = new SolidColorBrush(pillColor);

@@ -76,7 +76,7 @@
                                     Background="#4CC2FF" Foreground="#14222E"
                                     FontWeight="SemiBold" CornerRadius="6" />
                         </StackPanel>
-                        <TextBlock x:Name="AddError" FontSize="11" Foreground="#E69F00"
+                        <TextBlock x:Name="AddError" FontSize="11" Foreground="{ThemeResource PwWarningText}"
                                    Visibility="Collapsed" />
                     </StackPanel>
                 </Border>

@@ -19,11 +19,13 @@
                     <SolidColorBrush x:Key="PwTextPrimary" Color="#F3F4F6" />
                     <SolidColorBrush x:Key="PwTextSecondary" Color="#C9CDD4" />
                     <SolidColorBrush x:Key="PwTextMuted" Color="#8A919C" />
-                    <SolidColorBrush x:Key="PwTextDim" Color="#6B7280" />
+                    <SolidColorBrush x:Key="PwTextDim" Color="#66707C" />
                     <SolidColorBrush x:Key="PwRingTrack" Color="#26FFFFFF" />
                     <SolidColorBrush x:Key="PwBarTrack" Color="#1AFFFFFF" />
                     <SolidColorBrush x:Key="PwActiveRing" Color="#FFFFFF" />
                     <SolidColorBrush x:Key="PwStatusDotStroke" Color="#1B1B1B" />
+                    <SolidColorBrush x:Key="PwWarningText" Color="#E69F00" />
+                    <SolidColorBrush x:Key="PwBarFill" Color="#4CC2FF" />
                 </ResourceDictionary>
                 <!-- light: same structure, solid surfaces on light mica -->
                 <ResourceDictionary x:Key="Light">
@@ -35,11 +37,13 @@
                     <SolidColorBrush x:Key="PwTextPrimary" Color="#1B1B1B" />
                     <SolidColorBrush x:Key="PwTextSecondary" Color="#3C4043" />
                     <SolidColorBrush x:Key="PwTextMuted" Color="#5F6368" />
-                    <SolidColorBrush x:Key="PwTextDim" Color="#80868B" />
+                    <SolidColorBrush x:Key="PwTextDim" Color="#66707C" />
                     <SolidColorBrush x:Key="PwRingTrack" Color="#1F000000" />
                     <SolidColorBrush x:Key="PwBarTrack" Color="#14000000" />
                     <SolidColorBrush x:Key="PwActiveRing" Color="#1B1B1B" />
                     <SolidColorBrush x:Key="PwStatusDotStroke" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="PwWarningText" Color="#A66100" />
+                    <SolidColorBrush x:Key="PwBarFill" Color="#0072B2" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
