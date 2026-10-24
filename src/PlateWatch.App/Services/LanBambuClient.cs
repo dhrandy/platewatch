@@ -129,35 +129,40 @@ public sealed class LanBambuClient : IBambuClient, IDisposable
         return Task.CompletedTask;
     }
 
+    // Report messages after the initial pushall dump are diffs of changed
+    // fields, so every field is guarded: only overwrite state the printer
+    // actually sent, otherwise a partial report would zero unchanged values.
     private void ApplyPrint(JsonElement p)
     {
-        State.Status = Str(p, "gcode_state") switch
-        {
-            "RUNNING" or "PREPARE" or "SLICING" => PrinterStatus.Printing,
-            "PAUSE" => PrinterStatus.Paused,
-            "FINISH" => PrinterStatus.Finished,
-            "FAILED" => PrinterStatus.Error,
-            _ => State.Status == PrinterStatus.Printing ? State.Status : PrinterStatus.Idle,
-        };
+        if (p.TryGetProperty("gcode_state", out var gs))
+            State.Status = gs.GetString() switch
+            {
+                "RUNNING" or "PREPARE" or "SLICING" => PrinterStatus.Printing,
+                "PAUSE" => PrinterStatus.Paused,
+                "FINISH" => PrinterStatus.Finished,
+                "FAILED" => PrinterStatus.Error,
+                _ => State.Status == PrinterStatus.Printing ? State.Status : PrinterStatus.Idle,
+            };
         State.JobName = Str(p, "subtask_name") ?? Str(p, "gcode_file") ?? State.JobName;
-        State.Progress = Num(p, "mc_percent") / 100.0;
-        State.LayerCurrent = (int)Num(p, "layer_num");
-        State.LayerTotal = (int)Num(p, "total_layer_num");
-        State.SecondsLeft = Num(p, "mc_remaining_time") * 60;
-        State.NozzleC = Num(p, "nozzle_temper");
-        State.NozzleTargetC = Num(p, "nozzle_target_temper");
-        State.BedC = Num(p, "bed_temper");
-        State.BedTargetC = Num(p, "bed_target_temper");
+        if (p.TryGetProperty("mc_percent", out var v)) State.Progress = Num(v) / 100.0;
+        if (p.TryGetProperty("layer_num", out v)) State.LayerCurrent = (int)Num(v);
+        if (p.TryGetProperty("total_layer_num", out v)) State.LayerTotal = (int)Num(v);
+        if (p.TryGetProperty("mc_remaining_time", out v)) State.SecondsLeft = Num(v) * 60;
+        if (p.TryGetProperty("nozzle_temper", out v)) State.NozzleC = Num(v);
+        if (p.TryGetProperty("nozzle_target_temper", out v)) State.NozzleTargetC = Num(v);
+        if (p.TryGetProperty("bed_temper", out v)) State.BedC = Num(v);
+        if (p.TryGetProperty("bed_target_temper", out v)) State.BedTargetC = Num(v);
         if (p.TryGetProperty("chamber_temper", out var ch)) State.ChamberC = Num(ch);
-        State.FanPartPct = Num(p, "cooling_fan_speed");
-        State.FanAuxPct = Num(p, "aux_part_fan");
-        State.Speed = (int)Num(p, "spd_lvl") switch
-        {
-            1 => PrintSpeed.Silent,
-            3 => PrintSpeed.Sport,
-            4 => PrintSpeed.Ludicrous,
-            _ => PrintSpeed.Standard,
-        };
+        if (p.TryGetProperty("cooling_fan_speed", out v)) State.FanPartPct = Num(v);
+        if (p.TryGetProperty("aux_part_fan", out v)) State.FanAuxPct = Num(v);
+        if (p.TryGetProperty("spd_lvl", out v))
+            State.Speed = (int)Num(v) switch
+            {
+                1 => PrintSpeed.Silent,
+                3 => PrintSpeed.Sport,
+                4 => PrintSpeed.Ludicrous,
+                _ => PrintSpeed.Standard,
+            };
         if (p.TryGetProperty("lights_report", out var lights) && lights.ValueKind == JsonValueKind.Array)
             foreach (var light in lights.EnumerateArray())
                 if (Str(light, "node") == "chamber_light")
