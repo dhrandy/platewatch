@@ -1,6 +1,4 @@
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.UI;
-using Microsoft.UI.Xaml.Media.Imaging;
 using PlateWatch.Core;
 
 namespace PlateWatch.App.Services;
@@ -51,15 +49,6 @@ public static class TrayIconRenderer
             row.CopyTo(pixels.AsSpan(y * Size * 4));
         }
         return pixels;
-    }
-
-    public static WriteableBitmap Render(PrinterStatus status, double progress01, string colorHex)
-    {
-        var bmp = new WriteableBitmap(Size, Size);
-        var pixels = RenderPixels(status, progress01, colorHex);
-        using var stream = bmp.PixelBuffer.AsStream();
-        stream.Write(pixels);
-        return bmp;
     }
 
     private static bool InsideRoundedSquare(double x, double y, int size, double radius)

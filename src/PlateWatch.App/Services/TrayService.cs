@@ -112,7 +112,13 @@ public sealed class TrayService : IDisposable
         if (p is null) return;
         var s = p.Client.State;
         var style = DesignTokens.StyleFor(s.Status);
-        _icon.IconSource = TrayIconRenderer.Render(s.Status, s.Progress, style.ColorHex);
+        // H.NotifyIcon's IconSource path throws NotImplementedException for
+        // WriteableBitmap on WinUI 3 (crash 0xC000027B). Assign the native
+        // System.Drawing.Icon instead, built from the same pixels.
+        var pixels = TrayIconRenderer.RenderPixels(s.Status, s.Progress, style.ColorHex);
+        var oldIcon = _icon.Icon;
+        _icon.Icon = new System.Drawing.Icon(new MemoryStream(IconFile.EncodeIco(pixels, TrayIconRenderer.Size)));
+        oldIcon?.Dispose();
         _icon.ToolTipText = $"PlateWatch — {p.Name}: {style.Label}" +
             (s.Status is PlateWatch.Core.PrinterStatus.Printing or PlateWatch.Core.PrinterStatus.Paused
                 ? $" {p.PercentText}%"

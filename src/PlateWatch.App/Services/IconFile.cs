@@ -24,10 +24,17 @@ public static class IconFile
         var path = Path.Combine(dir, "icon.ico");
 
         var pixels = TrayIconRenderer.RenderPixels(PrinterStatus.Printing, 0.66, DesignTokens.Accent);
-        const int size = TrayIconRenderer.Size;
-        var png = PngEncoder.EncodePremultipliedBgra(pixels, size, size);
+        File.WriteAllBytes(path, EncodeIco(pixels, TrayIconRenderer.Size));
 
-        using var ico = new BinaryWriter(File.Create(path));
+        CurrentPath = path;
+    }
+
+    /// <summary>Wraps premultiplied BGRA pixels (TrayIconRenderer.RenderPixels) as a single-image ICO.</summary>
+    public static byte[] EncodeIco(byte[] bgraPremultiplied, int size)
+    {
+        var png = PngEncoder.EncodePremultipliedBgra(bgraPremultiplied, size, size);
+        using var ms = new MemoryStream();
+        using var ico = new BinaryWriter(ms);
         ico.Write((ushort)0);          // reserved
         ico.Write((ushort)1);          // icon type
         ico.Write((ushort)1);          // image count
@@ -41,7 +48,6 @@ public static class IconFile
         ico.Write((uint)22);           // image offset
         ico.Write(png);
         ico.Flush();
-
-        CurrentPath = path;
+        return ms.ToArray();
     }
 }

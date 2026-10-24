@@ -87,7 +87,7 @@ jobs:
           }
           Stop-Process -Id $p.Id -Force
           if ($content -notmatch 'window shown') { Write-Host "::error::window was not shown"; exit 1 }
-          if ($content -match 'ERROR') { Write-Host "::error::startup log contains ERROR"; exit 1 }
+          if ($content -match 'ERROR|FATAL') { Write-Host "::error::startup log contains ERROR/FATAL"; exit 1 }
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
         with:
