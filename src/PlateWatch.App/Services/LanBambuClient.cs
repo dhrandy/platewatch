@@ -18,6 +18,8 @@ public sealed class LanBambuClient : IBambuClient, IDisposable
     private readonly string _accessCode;
     private readonly CancellationTokenSource _stop = new();
     private int _retrying;
+    private DateTimeOffset _lastReport = DateTimeOffset.MinValue;
+    private int _watching;
 
     public LanBambuClient(PrinterIdentity identity, string accessCode)
     {
@@ -35,6 +37,7 @@ public sealed class LanBambuClient : IBambuClient, IDisposable
 
     public async Task StartAsync()
     {
+        _ = WatchdogLoop();
         try
         {
             await ConnectAndSubscribe();
@@ -67,7 +70,36 @@ public sealed class LanBambuClient : IBambuClient, IDisposable
             await _mqtt.SubscribeAsync(new MqttClientSubscribeOptionsBuilder()
                 .WithTopicFilter(f => f.WithTopic($"device/{Identity.Serial}/report"))
                 .Build(), timeout.Token);
+            _lastReport = DateTimeOffset.UtcNow;
             await SendAsync("{\"pushing\":{\"sequence_id\":\"0\",\"command\":\"pushall\"}}");
+        }
+    }
+
+    // A1/P1 firmware only pushes changed fields and can go quiet, and a
+    // half-dead socket never raises a disconnect. So: ask for a full dump
+    // every minute, and if nothing at all has arrived for 150s on a
+    // "connected" session, drop it and let the retry loop reconnect.
+    private async Task WatchdogLoop()
+    {
+        if (Interlocked.Exchange(ref _watching, 1) == 1) return;
+        while (!_stop.IsCancellationRequested)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(60)).ContinueWith(_ => { });
+            if (_stop.IsCancellationRequested) return;
+            if (!_mqtt.IsConnected) continue;
+            try
+            {
+                if (DateTimeOffset.UtcNow - _lastReport > TimeSpan.FromSeconds(150))
+                {
+                    await _mqtt.DisconnectAsync();
+                    continue;
+                }
+                await SendAsync("{\"pushing\":{\"sequence_id\":\"0\",\"command\":\"pushall\"}}");
+            }
+            catch
+            {
+                // next pass or the disconnect handler recovers
+            }
         }
     }
 
@@ -134,6 +166,10 @@ public sealed class LanBambuClient : IBambuClient, IDisposable
     // actually sent, otherwise a partial report would zero unchanged values.
     private void ApplyPrint(JsonElement p)
     {
+        _lastReport = DateTimeOffset.UtcNow;
+        // reports are flowing, so the printer is not offline even if this
+        // diff carries no gcode_state
+        if (State.Status == PrinterStatus.Offline) State.Status = PrinterStatus.Idle;
         if (p.TryGetProperty("gcode_state", out var gs))
             State.Status = gs.GetString() switch
             {
@@ -141,7 +177,8 @@ public sealed class LanBambuClient : IBambuClient, IDisposable
                 "PAUSE" => PrinterStatus.Paused,
                 "FINISH" => PrinterStatus.Finished,
                 "FAILED" => PrinterStatus.Error,
-                _ => State.Status == PrinterStatus.Printing ? State.Status : PrinterStatus.Idle,
+                "IDLE" => PrinterStatus.Idle,
+                _ => State.Status,
             };
         State.JobName = Str(p, "subtask_name") ?? Str(p, "gcode_file") ?? State.JobName;
         if (p.TryGetProperty("mc_percent", out var v)) State.Progress = Num(v) / 100.0;
